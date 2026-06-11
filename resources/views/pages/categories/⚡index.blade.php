@@ -76,12 +76,31 @@ new class extends Component
 
     public function editCategory()
     {
+        $validated = $this->validate([
+            'type' => 'required',
+            'name' => 'required|string|max:255'
+        ]);
 
+        $validated['name'] = strtolower(trim($validated['name']));
+
+        $exists = auth()->user()->category()->where('name', $validated['name'])->exists();
+
+        if($exists)
+        {
+            $this->addError('name', 'Category already exists.');
+            return;
+        }
+
+        $this->selectedCategory->update($validated);
+
+        $this->closeEditModal();
     }
 
     public function deleteCategory()
     {
+        $this->selectedCategory->delete();
 
+        $this->closeDeleteModal();
     }
 
     public function categories()
@@ -127,6 +146,44 @@ new class extends Component
 
     {{-- Main Section --}}
     <div>
+        <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6">
+            @forelse ($this->categories() as $category)
+                <flux:card wire:key='category-{{ $category->id }}'>
+                    <p>{{ $category->name }}</p>
+                    <p>{{ $category->type }}</p>
+                    <div class="flex justify-end gap-2 mt-6">
+                        <flux:button
+                            wire:click='editModal({{ $category->id }})'
+                            variant="filled"
+                            icon="pencil-square"
+                        >
+                            Edit
+                        </flux:button>
+
+                        <flux:button
+                            wire:click='deleteModal({{ $category->id }})'
+                            variant="danger"
+                            icon="trash"
+                        >
+                            Delete
+                        </flux:button>
+                    </div>
+                </flux:card>
+            @empty
+                <div class="col-span-1 md:col-span-3">
+                    <flux:card class="flex flex-col items-center justify-center p-8 text-center gap-3 w-full">
+                            <p class="text-zinc-500 italic text-sm">You have not created any categories. Add one</p>
+                            <flux:button
+                                wire:click='addModal'
+                                icon="plus-circle"
+                                wire:loading.attr='disabled'
+                            >
+                                Add Category
+                            </flux:button>
+                    </flux:card>
+                </div>
+            @endforelse
+        </div>
 
     </div>
 
@@ -166,23 +223,107 @@ new class extends Component
 
                 <div class="flex justify-end gap-2">
                     <flux:button
-                    wire:click='closeAddModal'
+                        wire:click='closeAddModal'
                     >
                         Cancel
                     </flux:button>
 
                     <flux:button
-                    wire:click='addCategory'
+                        variant="filled"
                     >
                         Create
                     </flux:button>
+                </div>
+            </form>
+        </x-modal>
+    @endif
 
+    {{-- Edit modal --}}
+    @if ($showEditModal == true)
+        <x-modal close="closeEditModal">
+            <form wire:submit='editCategory' class="space-y-6">
+                <div class="flex flex-row justify-between items-center">
+                    <flux:heading size="xl">
+                        Edit Category - {{ $selectedCategory->name }}
+                    </flux:heading>
+
+                    <flux:button wire:click='closeEditModal'>
+                        X
+                    </flux:button>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <flux:text class="mb-2">Type of Category</flux:text>
+                        <flux:select wire:model='type' placeholder="Select type of category..." required>
+                            <flux:select.option>Income</flux:select.option>
+                            <flux:select.option>Expenses</flux:select.option>
+                        </flux:select>
+                        @error('type')
+                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <flux:text class="mb-2">Name of Category</flux:text>
+                        <flux:input placeholder="Enter name of category..." wire:model='name' required/>
+                        @error('name')
+                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2">
+                    <flux:button
+                        wire:click='closeEditModal'
+                    >
+                        Cancel
+                    </flux:button>
+
+                    <flux:button
+                        type="submit"
+                    >
+                        Update
+                    </flux:button>
+                </div>
+            </form>
+        </x-modal>
+    @endif
+
+    {{-- Delete modal --}}
+    @if ($showDeleteModal == true)
+        <x-modal close="closeDeleteModal">
+            <form wire:submit='deleteCategory' class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <flux:heading size="xl">
+                            Delete Category - {{ $selectedCategory->name }}
+                        </flux:heading>
+                        <flux:text>
+                            Are you sure you want to delete this category?
+                        </flux:text>
+                    </div>
+                        <flux:button wire:click='closeAddModal'>
+                            X
+                        </flux:button>
 
                 </div>
 
+                <div class="flex justify-end gap-2">
+                    <flux:button
+                        wire:click='closeDeleteModal'
+                    >
+                        Cancel
+                    </flux:button>
 
+                    <flux:button
+                        type="submit"
+                        variant="danger"
+                    >
+                        Delete
+                    </flux:button>
+                </div>
             </form>
-
         </x-modal>
     @endif
+
 </div>
