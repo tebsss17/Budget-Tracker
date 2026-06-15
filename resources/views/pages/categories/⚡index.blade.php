@@ -149,8 +149,8 @@ new class extends Component
         <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6">
             @forelse ($this->categories() as $category)
                 <flux:card wire:key='category-{{ $category->id }}'>
-                    <p>{{ $category->name }}</p>
-                    <p>{{ $category->type }}</p>
+                    <p class="capitalize">{{ $category->name }}</p>
+                    <p class="capitalize">{{ $category->type }}</p>
                     <div class="flex justify-end gap-2 mt-6">
                         <flux:button
                             wire:click='editModal({{ $category->id }})'
@@ -209,7 +209,7 @@ new class extends Component
                             <flux:select.option>Expenses</flux:select.option>
                         </flux:select>
                         @error('type')
-                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                            <flux:text color="red">{{ $message }}</flux:text>
                         @enderror
                     </div>
                     <div>
@@ -229,7 +229,6 @@ new class extends Component
                     </flux:button>
 
                     <flux:button
-                        variant="filled"
                     >
                         Create
                     </flux:button>

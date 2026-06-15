@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignIdFor(Category::class)->constrained()->cascadeOnDelete();
             $table->decimal('amount_limit', 10, 2);
             $table->unsignedSmallInteger('year');
-            $table->unsignedTinyInteger('month  ');
+            $table->unsignedTinyInteger('month');
             $table->timestamps();
 
             $table->unique(['user_id', 'category_id', 'year', 'month']);
