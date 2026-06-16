@@ -184,12 +184,11 @@ new class extends Component
                 </div>
             @endforelse
         </div>
-
     </div>
 
     {{-- Add modal --}}
     @if ($showAddModal == true)
-        <x-modal close="closeAddModal">
+        <x-popup close="closeAddModal">
             <form wire:submit='addCategory' class="space-y-6">
                 <div class="flex flex-row justify-between items-center">
                     <flux:heading size="xl">
@@ -229,17 +228,18 @@ new class extends Component
                     </flux:button>
 
                     <flux:button
+                        type="submit"
                     >
                         Create
                     </flux:button>
                 </div>
             </form>
-        </x-modal>
+        </x-popup>
     @endif
 
     {{-- Edit modal --}}
     @if ($showEditModal == true)
-        <x-modal close="closeEditModal">
+        <x-popup close="closeEditModal">
             <form wire:submit='editCategory' class="space-y-6">
                 <div class="flex flex-row justify-between items-center">
                     <flux:heading size="xl">
@@ -285,12 +285,12 @@ new class extends Component
                     </flux:button>
                 </div>
             </form>
-        </x-modal>
+        </x-popup>
     @endif
 
     {{-- Delete modal --}}
     @if ($showDeleteModal == true)
-        <x-modal close="closeDeleteModal">
+        <x-popup close="closeDeleteModal">
             <form wire:submit='deleteCategory' class="space-y-6">
                 <div class="flex justify-between items-center">
                     <div>
@@ -322,7 +322,7 @@ new class extends Component
                     </flux:button>
                 </div>
             </form>
-        </x-modal>
+        </x-popup>
     @endif
 
 </div>

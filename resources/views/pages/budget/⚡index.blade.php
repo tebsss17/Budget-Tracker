@@ -9,26 +9,27 @@ new class extends Component
     public $showEditModal = false;
 
     public $category_id = '';
-    public $type = '';
     public $amount_limit = '';
     public $month = '';
     public $year = '';
+    public $selectedDate = '';
 
     public ?Budget $selectedBudget = null;
 
     public function mount()
     {
-        $this->month = now()->month;
-        $this->year = now()->year;
+        $this->selectedDate = now()->format('Y-m');
     }
 
     public function budgets()
     {
+        $split = explode('-', $this->selectedDate);
+
         return Auth::user()
             ->budget()
             ->with('category')
-            ->where('month', $this->month)
-            ->where('year', $this->year)
+            ->where('month', (int)$split[1])
+            ->where('year', $split[0])
             ->get();
     }
 
@@ -53,10 +54,8 @@ new class extends Component
     {
         $this->reset([
             'category_id',
-            'type',
+            'selectedDate',
             'amount_limit',
-            'month',
-            'year',
         ]);
 
         $this->showAddModal = false;
@@ -64,6 +63,9 @@ new class extends Component
 
     public function setBudget()
     {
+        $validated = $this->validate([
+            'category_id' => 'required|'
+        ]);
 
     }
 
@@ -116,7 +118,7 @@ new class extends Component
         </div>
 
         @if ($showAddModal == true)
-            <x-modal close="closeAddModal">
+            <x-popup close="closeAddModal">
                 <form wire:submit='setBudget' class="space-y-6">
                     <div class="flex flex-row justify-between items-center">
                         <flux:heading size="xl">
@@ -131,7 +133,7 @@ new class extends Component
                     <div class="space-y-6">
                         <div>
                             <flux:text class="mb-2">Category</flux:text>
-                            <flux:select wire:model='category_id' palceholder="Select the type of category..." required>
+                            <flux:select wire:model='category_id' placeholder="Select the type of category..." required>
                                 @foreach ($this->categories() as $category)
                                     <flux:select.option value="{{ $category->id }}" class="capitalize">{{ $category->name }}</flux:select.option>
                                 @endforeach
@@ -139,26 +141,40 @@ new class extends Component
                         </div>
 
                         <div>
-                            <flux:text class="mb-2">Month</flux:text>
-                            <flux:select wire:model.live='month'>
-                                @foreach (range(now()->year - 1, now()->year + 100) as $year)
-                                    <flux:select.option value="{{ $year }}">{{ $year }}</flux:select.option>
-                                @endforeach
-                            </flux:select>
+                            <flux:text class="mb-2">Selected Date</flux:text>
+                            <flux:input
+                                wire:model.live='selectedDate'
+                                type="month"
+                                required
+                            />
                         </div>
 
                         <div>
-                            <flux:text class="mb-2">Year</flux:text>
-                            <flux:select wire:model.live='year'>
-                                @foreach (range(now()->year - 1, now()->year + 50) as $year)
-                                    <flux:select.option value="{{ $year }}">{{ $year }}</flux:select.option>
-                                @endforeach
-                            </flux:select>
+                            <flux:text class="mb-2">Amount</flux:text>
+                            <flux:input
+                                wire:model='amount_limit'
+                                required
+                                type="number"
+                                step="0.01"
+                            />
                         </div>
 
+                        <div class="flex justify-end gap-2">
+                            <flux:button
+                                wire:click='closeAddModal'
+                            >
+                                Cancel
+                            </flux:button>
+
+                            <flux:button
+                                type="submit"
+                            >
+                                Set Budget
+                            </flux:button>
+                        </div>
                     </div>
                 </form>
-            </x-modal>
+            </x-popup>
         @endif
     </div>
 </div>
