@@ -38,13 +38,6 @@ new class extends Component
         return Auth::user()->category()->orderBy('name')->get();
     }
 
-    public function openAddModal()
-    {
-        $this->category_id = '';
-        $this->amount_limit = '';
-        $this->showAddModal = true;
-    }
-
     public function addModal()
     {
         $this->showAddModal = true;
@@ -57,16 +50,44 @@ new class extends Component
             'selectedDate',
             'amount_limit',
         ]);
-
+        $this->resetErrorBag();
         $this->showAddModal = false;
     }
 
     public function setBudget()
     {
-        $validated = $this->validate([
-            'category_id' => 'required|'
+        $this->validate([
+            'category_id' => 'required',
+            'amount_limit' => 'required|min:50|numeric',
+            'selectedDate' => 'required',
         ]);
 
+        $split = explode('-', $this->selectedDate);
+        $year = $split[0];
+        $month = (int)$split[1];
+
+        $exists = Auth::user()->budget()
+            ->where('category_id', $this->category_id)
+            ->where('month', $month)
+            ->where('year', $year)
+            ->exists();
+
+            if($exists)
+            {
+                $this->addError('selectedDate', 'Budget already set for this period.');
+                return;
+            }
+
+        Auth::user()
+            ->budget()
+            ->create([
+                'category_id' => $this->category_id,
+                'amount_limit' => $this->amount_limit,
+                'year' => $year,
+                'month' => $month,
+            ]);
+
+        $this->closeAddModal();
     }
 
 };
@@ -114,7 +135,45 @@ new class extends Component
 
         {{-- List of budgets --}}
         <div>
+            <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6">
+                @forelse ($this->budgets() as $budget)
+                    <flux:card wire:key='budget-{{ $budget->id }}'>
+                        <p class="capitalize">{{ $budget->category->name }}</p>
+                        <p class="capitalize">{{ date('F Y', mktime(0, 0, 0, $budget->month, 1, $budget->year)) }}</p>
+                        <p class="capitalize">{{ $budget->amount_limit }}</p>
+                        <div class="flex justify-end gap-2 mt-6">
+                            <flux:button
+                                wire:click='editModal({{ $budget->id }})'
+                                variant="filled"
+                                icon="pencil-square"
+                            >
+                                Edit
+                            </flux:button>
 
+                            <flux:button
+                                wire:click='deleteModal({{ $budget->id }})'
+                                variant="danger"
+                                icon="trash"
+                            >
+                                Delete
+                            </flux:button>
+                        </div>
+                    </flux:card>
+                @empty
+                    <div class="col-span-1 md:col-span-3 xl:col-span-4">
+                        <flux:card class="flex flex-col items-center justify-center p-8 text-center gap-3 w-full">
+                                <p class="text-zinc-500 italic text-sm">You have not set a budget yet. Add one</p>
+                                <flux:button
+                                    wire:click='addModal'
+                                    icon="plus-circle"
+                                    wire:loading.attr='disabled'
+                                >
+                                    Set Budget
+                                </flux:button>
+                        </flux:card>
+                    </div>
+                @endforelse
+            </div>
         </div>
 
         @if ($showAddModal == true)
@@ -138,6 +197,9 @@ new class extends Component
                                     <flux:select.option value="{{ $category->id }}" class="capitalize">{{ $category->name }}</flux:select.option>
                                 @endforeach
                             </flux:select>
+                            @error('category_id')
+                                <p class="text-sm text-red-500">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>
@@ -147,6 +209,9 @@ new class extends Component
                                 type="month"
                                 required
                             />
+                            @error('selectedDate')
+                                <p class="text-sm text-red-500">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>
@@ -157,6 +222,9 @@ new class extends Component
                                 type="number"
                                 step="0.01"
                             />
+                            @error('amount_limit')
+                                <p class="text-sm text-red-500">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div class="flex justify-end gap-2">

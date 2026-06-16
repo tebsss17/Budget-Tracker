@@ -36,12 +36,14 @@ new class extends Component
     public function closeAddModal()
     {
         $this->reset(['name', 'type']);
+        $this->resetErrorBag();
         $this->showAddModal = false;
     }
 
     public function closeEditModal()
     {
         $this->reset(['name', 'type']);
+        $this->resetErrorBag();
         $this->showEditModal = false;
     }
 
@@ -170,7 +172,7 @@ new class extends Component
                     </div>
                 </flux:card>
             @empty
-                <div class="col-span-1 md:col-span-3">
+                <div class="col-span-1 md:col-span-3 xl:col-span-4">
                     <flux:card class="flex flex-col items-center justify-center p-8 text-center gap-3 w-full">
                             <p class="text-zinc-500 italic text-sm">You have not created any categories. Add one</p>
                             <flux:button
