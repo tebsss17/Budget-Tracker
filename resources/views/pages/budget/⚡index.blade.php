@@ -7,14 +7,14 @@ new class extends Component
 {
     public $showAddModal = false;
     public $showEditModal = false;
+    public $showDeleteModal = false;
 
     public $category_id = '';
     public $amount_limit = '';
-    public $month = '';
-    public $year = '';
-    public $selectedDate = '';
 
-    public ?Budget $selectedBudget = null;
+
+    public $selectedDate = '';
+    public $selectedBudget = null;
 
     public function mount()
     {
@@ -47,11 +47,37 @@ new class extends Component
     {
         $this->reset([
             'category_id',
-            'selectedDate',
             'amount_limit',
         ]);
+
+        $this->selectedDate = now()->format('Y-m');
         $this->resetErrorBag();
         $this->showAddModal = false;
+    }
+
+    public function editModal($id)
+    {
+        $this->selectedBudget = Budget::findOrFail($id);
+
+        $formattedDate = str_pad($this->selectedBudget->month, 2, 0, STR_PAD_LEFT);
+
+        $this->category_id = $this->selectedBudget->category_id;
+        $this->amount_limit = $this->selectedBudget->amount_limit;
+        $this->selectedDate = "{$this->selectedBudget->year}-{$formattedDate}";
+
+        $this->showEditModal = true;
+    }
+
+    public function closeEditModal()
+    {
+        $this->reset([
+            'category_id',
+            'amount_limit'
+        ]);
+
+        $this->selectedDate = now()->format('Y-m');
+        $this->resetErrorBag();
+        $this->showEditModal = false;
     }
 
     public function setBudget()
@@ -88,6 +114,40 @@ new class extends Component
             ]);
 
         $this->closeAddModal();
+    }
+
+    public function updateBudget()
+    {
+        $this->validate([
+            'category_id' => 'required',
+            'amount_limit' => 'required|numeric|min:50',
+            'selectedDate' => 'required',
+        ]);
+
+        $split = explode('-', $this->selectedDate);
+        $year = $split[0];
+        $month = (int)$split[1];
+
+        $exists = Auth::user()->budget()
+            ->where('category_id', $this->category_id)
+            ->where('month', $month)
+            ->where('year', $year)
+            ->exists();
+
+            if($exists)
+            {
+                $this->addError('selectedDate', 'Budget already set for this period.');
+                return;
+            }
+
+        $this->selectedBudget->update([
+            'category_id' => $this->category_id,
+            'amount_limit' => $this->amount_limit,
+            'year' => $year,
+            'month' => $month,
+        ]);
+
+        $this->closeEditModal();
     }
 
 };
@@ -175,74 +235,145 @@ new class extends Component
                 @endforelse
             </div>
         </div>
+    </div>
 
-        @if ($showAddModal == true)
-            <x-popup close="closeAddModal">
-                <form wire:submit='setBudget' class="space-y-6">
-                    <div class="flex flex-row justify-between items-center">
-                        <flux:heading size="xl">
+    {{-- Add Modal --}}
+    @if ($showAddModal == true)
+        <x-popup close="closeAddModal">
+            <form wire:submit='setBudget' class="space-y-6">
+                <div class="flex flex-row justify-between items-center">
+                    <flux:heading size="xl">
+                        Set Budget
+                    </flux:heading>
+
+                    <flux:button wire:click='closeAddModal'>
+                        X
+                    </flux:button>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <flux:text class="mb-2">Category</flux:text>
+                        <flux:select wire:model='category_id' placeholder="Select the type of category..." required>
+                            @foreach ($this->categories() as $category)
+                                <flux:select.option value="{{ $category->id }}" class="capitalize">{{ $category->name }}</flux:select.option>
+                            @endforeach
+                        </flux:select>
+                        @error('category_id')
+                            <p class="text-sm text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <flux:text class="mb-2">Selected Date</flux:text>
+                        <flux:input
+                            wire:model.live='selectedDate'
+                            type="month"
+                            required
+                        />
+                        @error('selectedDate')
+                            <p class="text-sm text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <flux:text class="mb-2">Amount</flux:text>
+                        <flux:input
+                            wire:model='amount_limit'
+                            required
+                            type="number"
+                            step="0.01"
+                        />
+                        @error('amount_limit')
+                            <p class="text-sm text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex justify-end gap-2">
+                        <flux:button
+                            wire:click='closeAddModal'
+                        >
+                            Cancel
+                        </flux:button>
+
+                        <flux:button
+                            type="submit"
+                        >
                             Set Budget
-                        </flux:heading>
-
-                        <flux:button wire:click='closeAddModal'>
-                            X
                         </flux:button>
                     </div>
+                </div>
+            </form>
+        </x-popup>
+    @endif
 
-                    <div class="space-y-6">
-                        <div>
-                            <flux:text class="mb-2">Category</flux:text>
-                            <flux:select wire:model='category_id' placeholder="Select the type of category..." required>
-                                @foreach ($this->categories() as $category)
-                                    <flux:select.option value="{{ $category->id }}" class="capitalize">{{ $category->name }}</flux:select.option>
-                                @endforeach
-                            </flux:select>
-                            @error('category_id')
-                                <p class="text-sm text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
+    {{-- Edit Modal --}}
+    @if ($showEditModal == true)
+        <x-popup close="closeEditModal">
+            <form wire:submit='updateBudget' class="space-y-6">
+                <div class="flex flex-row justify-between items-center">
+                    <flux:heading size="xl">
+                        Update Budget for {{ $selectedBudget->category->name }}
+                    </flux:heading>
 
-                        <div>
-                            <flux:text class="mb-2">Selected Date</flux:text>
-                            <flux:input
-                                wire:model.live='selectedDate'
-                                type="month"
-                                required
-                            />
-                            @error('selectedDate')
-                                <p class="text-sm text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
+                    <flux:button wire:click='closeAddModal'>
+                        X
+                    </flux:button>
+                </div>
 
-                        <div>
-                            <flux:text class="mb-2">Amount</flux:text>
-                            <flux:input
-                                wire:model='amount_limit'
-                                required
-                                type="number"
-                                step="0.01"
-                            />
-                            @error('amount_limit')
-                                <p class="text-sm text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="flex justify-end gap-2">
-                            <flux:button
-                                wire:click='closeAddModal'
-                            >
-                                Cancel
-                            </flux:button>
-
-                            <flux:button
-                                type="submit"
-                            >
-                                Set Budget
-                            </flux:button>
-                        </div>
+                <div class="space-y-6">
+                    <div>
+                        <flux:text class="mb-2">Category</flux:text>
+                        <flux:select wire:model='category_id' placeholder="Select the type of category..." required>
+                            @foreach ($this->categories() as $category)
+                                <flux:select.option value="{{ $category->id }}" class="capitalize">{{ $category->name }}</flux:select.option>
+                            @endforeach
+                        </flux:select>
+                        @error('category_id')
+                            <p class="text-sm text-red-500">{{ $message }}</p>
+                        @enderror
                     </div>
-                </form>
-            </x-popup>
-        @endif
-    </div>
+
+                    <div>
+                        <flux:text class="mb-2">Selected Date</flux:text>
+                        <flux:input
+                            wire:model.live='selectedDate'
+                            type="month"
+                            required
+                        />
+                        @error('selectedDate')
+                            <p class="text-sm text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <flux:text class="mb-2">Amount</flux:text>
+                        <flux:input
+                            wire:model='amount_limit'
+                            required
+                            type="number"
+                            step="0.01"
+                        />
+                        @error('amount_limit')
+                            <p class="text-sm text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex justify-end gap-2">
+                        <flux:button
+                            wire:click='closeAddModal'
+                        >
+                            Cancel
+                        </flux:button>
+
+                        <flux:button
+                            type="submit"
+                        >
+                            Set Budget
+                        </flux:button>
+                    </div>
+                </div>
+            </form>
+        </x-popup>
+    @endif
 </div>
