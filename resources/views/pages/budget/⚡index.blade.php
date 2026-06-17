@@ -5,6 +5,7 @@ use App\Models\Budget;
 
 new class extends Component
 {
+    // VARIABLES
     public $showAddModal = false;
     public $showEditModal = false;
     public $showDeleteModal = false;
@@ -17,6 +18,8 @@ new class extends Component
     public $selectedBudget = null;
     public $editDate ='';
 
+
+    // Main FUNCTIONS
     public function mount()
     {
         $this->selectedDate = now()->format('Y-m');
@@ -79,6 +82,31 @@ new class extends Component
         $this->showEditModal = false;
     }
 
+    public function deleteModal($id)
+    {
+        $this->selectedBudget = Budget::findOrFail($id);
+
+        $formattedDate = str_pad($this->selectedBudget->month, 2, 0, STR_PAD_LEFT);
+
+        $this->category_id = $this->selectedBudget->category_id;
+        $this->amount_limit = $this->selectedBudget->amount_limit;
+        $this->editDate = "{$this->selectedBudget->year}-{$formattedDate}";
+
+        $this->showDeleteModal = true;
+    }
+
+    public function closeDeleteModal()
+    {
+        $this->reset([
+            'category_id',
+            'amount_limit'
+        ]);
+
+        $this->showDeleteModal = false;
+    }
+
+
+    // CRUD LOGIC
     public function setBudget()
     {
         $this->validate([
@@ -148,6 +176,13 @@ new class extends Component
         ]);
 
         $this->closeEditModal();
+    }
+
+    public function deleteBudget()
+    {
+        $this->selectedBudget->delete();
+
+        $this->closeDeleteModal();
     }
 
 };
@@ -298,6 +333,7 @@ new class extends Component
 
                         <flux:button
                             type="submit"
+                            wire:loading.attr='disabled'
                         >
                             Set Budget
                         </flux:button>
@@ -368,8 +404,49 @@ new class extends Component
 
                         <flux:button
                             type="submit"
+                            wire:loading.attr='disabled'
                         >
                             Update Budget
+                        </flux:button>
+                    </div>
+                </div>
+            </form>
+        </x-popup>
+    @endif
+
+    {{-- Delete Modal --}}
+    @if ($showDeleteModal == true)
+        <x-popup close="closeDeleteModal">
+            <form wire:submit='deleteBudget' class="space-y-6">
+                <div class="flex flex-row justify-between items-center">
+                    <flux:heading size="xl">
+                        Delete {{ $selectedBudget->category->name }} budget
+                    </flux:heading>
+
+                    <flux:button wire:click='closeDeleteModal'>
+                        X
+                    </flux:button>
+                </div>
+
+                <div>
+                    <flux:text>
+                        Are you sure you want to delete this budget?
+                    </flux:text>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="flex justify-end gap-2">
+                        <flux:button
+                            wire:click='closeDeleteModal'
+                        >
+                            Cancel
+                        </flux:button>
+
+                        <flux:button
+                            type="submit"
+                            wire:loading.attr='disabled'
+                        >
+                            Delete Budget
                         </flux:button>
                     </div>
                 </div>
