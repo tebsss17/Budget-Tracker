@@ -15,6 +15,7 @@ new class extends Component
 
     public $selectedDate = '';
     public $selectedBudget = null;
+    public $editDate ='';
 
     public function mount()
     {
@@ -23,13 +24,11 @@ new class extends Component
 
     public function budgets()
     {
-        $split = explode('-', $this->selectedDate);
-
         return Auth::user()
             ->budget()
             ->with('category')
-            ->where('month', (int)$split[1])
-            ->where('year', $split[0])
+            ->orderBy('month', 'desc')
+            ->orderBy('year', 'desc')
             ->get();
     }
 
@@ -63,7 +62,7 @@ new class extends Component
 
         $this->category_id = $this->selectedBudget->category_id;
         $this->amount_limit = $this->selectedBudget->amount_limit;
-        $this->selectedDate = "{$this->selectedBudget->year}-{$formattedDate}";
+        $this->editDate = "{$this->selectedBudget->year}-{$formattedDate}";
 
         $this->showEditModal = true;
     }
@@ -121,10 +120,10 @@ new class extends Component
         $this->validate([
             'category_id' => 'required',
             'amount_limit' => 'required|numeric|min:50',
-            'selectedDate' => 'required',
+            'editDate' => 'required',
         ]);
 
-        $split = explode('-', $this->selectedDate);
+        $split = explode('-', $this->editDate);
         $year = $split[0];
         $month = (int)$split[1];
 
@@ -132,11 +131,12 @@ new class extends Component
             ->where('category_id', $this->category_id)
             ->where('month', $month)
             ->where('year', $year)
+            ->where('id', '!=' , $this->selectedBudget->id)
             ->exists();
 
             if($exists)
             {
-                $this->addError('selectedDate', 'Budget already set for this period.');
+                $this->addError('editDate', 'Budget already set for this period.');
                 return;
             }
 
@@ -267,7 +267,7 @@ new class extends Component
                     <div>
                         <flux:text class="mb-2">Selected Date</flux:text>
                         <flux:input
-                            wire:model.live='selectedDate'
+                            wire:model='selectedDate'
                             type="month"
                             required
                         />
@@ -313,10 +313,10 @@ new class extends Component
             <form wire:submit='updateBudget' class="space-y-6">
                 <div class="flex flex-row justify-between items-center">
                     <flux:heading size="xl">
-                        Update Budget for {{ $selectedBudget->category->name }}
+                        Update {{ $selectedBudget->category->name }} budget
                     </flux:heading>
 
-                    <flux:button wire:click='closeAddModal'>
+                    <flux:button wire:click='closeEditModal'>
                         X
                     </flux:button>
                 </div>
@@ -337,11 +337,11 @@ new class extends Component
                     <div>
                         <flux:text class="mb-2">Selected Date</flux:text>
                         <flux:input
-                            wire:model.live='selectedDate'
+                            wire:model='editDate'
                             type="month"
                             required
                         />
-                        @error('selectedDate')
+                        @error('editDate')
                             <p class="text-sm text-red-500">{{ $message }}</p>
                         @enderror
                     </div>
@@ -369,7 +369,7 @@ new class extends Component
                         <flux:button
                             type="submit"
                         >
-                            Set Budget
+                            Update Budget
                         </flux:button>
                     </div>
                 </div>
