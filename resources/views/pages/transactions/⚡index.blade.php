@@ -11,7 +11,7 @@ new class extends Component
 
     public $category_id = '';
     public $amount = '';
-    public $type = 'expense';
+    public $type = 'Expense';
     public $description = '';
     public $transaction_date = '';
 
@@ -21,7 +21,7 @@ new class extends Component
     // QUERY FUNCTIONS
     public function mount()
     {
-        $this->transaction_date = now()->format('Y-m-D');
+        $this->transaction_date = now()->format('Y-m-d');
     }
 
     public function transactions()
@@ -58,7 +58,7 @@ new class extends Component
     // MODAL FUNCTIONS
     public function addModal()
     {
-        $this->type = 'expense';
+        $this->type = 'Expense';
         $this->transaction_date = now()->format('Y-m-d');
         $this->showAddModal = true;
     }
@@ -143,5 +143,50 @@ new class extends Component
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
     </div>
+
+    {{-- Filter --}}
+    <div>
+
+    </div>
+
+    {{-- Main Section --}}
+
+    {{-- Add Modal --}}
+    @if ($showAddModal == true)
+        <x-popup close="closeAddModal">
+            <form wire:submit='addTransaction' class="space-y-6">
+                <div class="flex flex-row justify-between items-center">
+                    <flux:heading size="xl">
+                        Create Transaction
+                    </flux:heading>
+
+                    <flux:button wire:click='closeAddModal'>
+                        X
+                    </flux:button>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <flux:text class="mb-2">Type of Trancsaction</flux:text>
+                        <flux:select wire:model='type' placeholder="Select type of transaction..." required>
+                            <flux:select.option>Income</flux:select.option>
+                            <flux:select.option>Expense</flux:select.option>
+                        </flux:select>
+                        @error('type')
+                            <flux:text color="red">{{ $message }}</flux:text>
+                        @enderror
+                    </div>
+                    <div>
+                        <flux:text class="mb-2">Type of Category</flux:text>
+                        <flux:input placeholder="Enter name of category..." wire:model='name' required/>
+                        @error('name')
+                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+            </form>
+        </x-popup>
+    @endif
 
 </div>
