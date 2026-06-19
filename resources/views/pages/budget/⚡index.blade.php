@@ -19,7 +19,7 @@ new class extends Component
     public $editDate ='';
 
 
-    // Main FUNCTIONS
+    // QUERY FUNCTIONS
     public function mount()
     {
         $this->selectedDate = now()->format('Y-m');
