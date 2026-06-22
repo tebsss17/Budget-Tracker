@@ -176,15 +176,52 @@ new class extends Component
                             <flux:text color="red">{{ $message }}</flux:text>
                         @enderror
                     </div>
+
                     <div>
                         <flux:text class="mb-2">Type of Category</flux:text>
-                        <flux:input placeholder="Enter name of category..." wire:model='name' required/>
-                        @error('name')
+                        <flux:input placeholder="Select name of category..." wire:model='category_id' required/>
+                        @error('category_id')
                             <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                </div>
 
+                    <div>
+                        <flux:text class="mb-2">Amount</flux:text>
+                        <flux:input placeholder="Enter amount..." wire:model='amount' required/>
+                        @error('amount')
+                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <div class="flex flex-row items-center mb-2 gap-2">
+                            <flux:text class="">Note <flux:badge size="sm" color="zinc" rounded>optional</flux:badge></flux:text>
+                        </div>
+                        <flux:textarea placeholder="Enter notes..." wire:model='description'/>
+                        @error('description')
+                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex justify-end gap-2">
+                        <flux:button
+                            wire:click='closeAddModal'
+                        >
+                            Cancel
+                        </flux:button>
+
+                        <flux:button
+                            type="submit"
+                            icon="plus-circle"
+                        >
+                            Create Transaction
+                        </flux:button>
+
+
+
+                    </div>
+
+                </div>
             </form>
         </x-popup>
     @endif
