@@ -112,7 +112,18 @@ new class extends Component
         $this->transaction_date = $this->selectedTransaction->transaction_date;
 
         $this->showViewModal = true;
+    }
 
+    public function closeViewModal()
+    {
+        $this->reset([
+            'category_id',
+            'amount',
+            'type',
+            'description',
+        ]);
+        $this->resetErrorBag();
+        $this->showViewModal = false;
     }
 
 
@@ -133,7 +144,7 @@ new class extends Component
         $this->closeAddModal();
     }
 
-    public function editTransaction($id)
+    public function editTransaction()
     {
         $validated = $this->validate([
             'category_id' => 'required|exists:categories,id',
@@ -206,18 +217,18 @@ new class extends Component
                     <p>{{ $transaction->amount }}</p>
                     <div class="flex justify-end gap-2 mt-6">
                             <flux:button
-                                wire:click='editModal({{ $transaction->id }})'
+                                wire:click='viewModal({{ $transaction->id }})'
                                 variant="filled"
                                 icon="eye"
                             >
-                                Edit
+                                Show
                             </flux:button>
 
                             <flux:button
-                                wire:click='viewModal({{ $transaction->id }})'
+                                wire:click='editModal({{ $transaction->id }})'
                                 icon="pencil-square"
                             >
-                                Show
+                                Edit
                             </flux:button>
                         </div>
                 </flux:card>
@@ -317,7 +328,7 @@ new class extends Component
 
     {{-- Edit Modal --}}
     @if ($showEditModal == true)
-        <x-popup close="closeAddModal">
+        <x-popup close="closeEditModal">
             <form wire:submit='editTransaction' class="space-y-6">
                 <div class="flex flex-row justify-between items-center">
                     <flux:heading size="xl">
@@ -402,6 +413,58 @@ new class extends Component
             </form>
         </x-popup>
     @endif
+
+    {{-- View Modal --}}
+    @if ($showViewModal == true)
+        <x-popup close="closeViewModal">
+            <form  class="space-y-6">
+                <div class="flex flex-row justify-between items-center">
+                    <flux:heading size="xl">
+                        View Transaction no. {{ $selectedTransaction->id }}
+                    </flux:heading>
+
+                    <flux:button wire:click='closeViewModal'>
+                        X
+                    </flux:button>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+
+                    </div>
+
+                    <div>
+
+                    </div>
+
+                    <div>
+
+                    </div>
+
+                    <div>
+
+                    </div>
+
+                    <div class="flex justify-end gap-2">
+                        <flux:button
+                            wire:click='closeViewModal'
+                        >
+                            Cancel
+                        </flux:button>
+
+                        <flux:button
+                            type="submit"
+                            icon="plus-circle"
+                        >
+                            Create Transaction
+                        </flux:button>
+                    </div>
+
+                </div>
+            </form>
+        </x-popup>
+    @endif
+
 
 
 </div>
