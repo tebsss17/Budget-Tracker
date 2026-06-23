@@ -118,6 +118,21 @@ new class extends Component
         $this->closeAddModal();
     }
 
+    public function editTransaction($id)
+    {
+        $validated = $this->validate([
+            'category_id' => 'required|exists:categories,id',
+            'type' => 'required|string',
+            'amount' => 'required|numeric|min:50',
+            'description' => 'nullable|string|max:500',
+        ]);
+
+        $validated['transaction_date'] = $this->transaction_date;
+
+        $this->selectedTransaction->update($validated);
+
+        $this->closeEditModal();
+    }
 };
 ?>
 
@@ -156,7 +171,9 @@ new class extends Component
 
     {{-- KPI Cards --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
+        <x-card>te</x-card>
+        <x-card>tes</x-card>
+        <x-card>tet</x-card>
     </div>
 
     {{-- Filter --}}
@@ -165,6 +182,36 @@ new class extends Component
     </div>
 
     {{-- Main Section --}}
+    <div class="mt-20">
+        <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6">
+            @forelse ($this->transactions() as $transaction )
+                <flux:card wire:key='transaction-{{ $transaction->id }}'>
+                    <p>{{ $transaction->type }}</p>
+                    <p class="capitalize">{{ $transaction->category->name }}</p>
+                    <p>{{ $transaction->amount }}</p>
+                    <div class="flex justify-end gap-2 mt-6">
+                            <flux:button
+                                wire:click='editModal({{ $transaction->id }})'
+                                variant="filled"
+                                icon="pencil-square"
+                            >
+                                Edit
+                            </flux:button>
+
+                            <flux:button
+                                wire:click='deleteModal({{ $transaction->id }})'
+                                variant="danger"
+                                icon="eye"
+                            >
+                                Show
+                            </flux:button>
+                        </div>
+                </flux:card>
+            @empty
+
+            @endforelse
+        </div>
+    </div>
 
     {{-- Add Modal --}}
     @if ($showAddModal == true)
@@ -253,5 +300,94 @@ new class extends Component
             </form>
         </x-popup>
     @endif
+
+    {{-- Edit Modal --}}
+    @if ($showEditModal == true)
+        <x-popup close="closeAddModal">
+            <form wire:submit='editTransaction' class="space-y-6">
+                <div class="flex flex-row justify-between items-center">
+                    <flux:heading size="xl">
+                        Create Transaction
+                    </flux:heading>
+
+                    <flux:button wire:click='closeAddModal'>
+                        X
+                    </flux:button>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <flux:text class="mb-2">Type of Trancsaction</flux:text>
+                        <flux:select wire:model='type' placeholder="Select type of transaction..." required>
+                            <flux:select.option>Income</flux:select.option>
+                            <flux:select.option>Expense</flux:select.option>
+                        </flux:select>
+                        @error('type')
+                            <flux:text color="red">{{ $message }}</flux:text>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <flux:text class="mb-2">Type of Category</flux:text>
+                        <flux:select
+                            placeholder="Select name of category..."
+                            wire:model='category_id'
+                            required
+                        >
+                            @foreach ( $this->categories() as $category )
+                                <flux:select.option value="{{ $category->id }}" class="capitalize">{{ $category->name }}</flux:select.option>
+                            @endforeach
+                        </flux:select>
+                        @error('category_id')
+                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <flux:text class="mb-2">Amount</flux:text>
+                        <flux:input
+                            placeholder="Enter amount..."
+                            wire:model='amount'
+                            required
+                            type="number"
+                        />
+                        @error('amount')
+                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <div class="flex flex-row items-center mb-2 gap-2">
+                            <flux:text>Note<flux:badge size="sm" color="zinc" rounded>optional</flux:badge></flux:text>
+                        </div>
+                        <flux:textarea
+                            placeholder="Enter notes..."
+                            wire:model='description'
+                        />
+                        @error('description')
+                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex justify-end gap-2">
+                        <flux:button
+                            wire:click='closeEditModal'
+                        >
+                            Cancel
+                        </flux:button>
+
+                        <flux:button
+                            type="submit"
+                            icon="plus-circle"
+                        >
+                            Create Transaction
+                        </flux:button>
+                    </div>
+
+                </div>
+            </form>
+        </x-popup>
+    @endif
+
 
 </div>
