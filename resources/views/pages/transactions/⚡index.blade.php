@@ -102,6 +102,21 @@ new class extends Component
 
 
     // CRUD FUNCTIONS
+    public function addTransaction()
+    {
+        $validated = $this->validate([
+            'category_id' => 'required|exists:categories,id',
+            'type' => 'required|string',
+            'amount' => 'required|numeric|min:50',
+            'description' => 'nullable|string|max:500',
+        ]);
+
+        $validated['transaction_date'] = $this->transaction_date;
+
+        Auth::user()->transaction()->create($validated);
+
+        $this->closeAddModal();
+    }
 
 };
 ?>
@@ -179,7 +194,15 @@ new class extends Component
 
                     <div>
                         <flux:text class="mb-2">Type of Category</flux:text>
-                        <flux:input placeholder="Select name of category..." wire:model='category_id' required/>
+                        <flux:select
+                            placeholder="Select name of category..."
+                            wire:model='category_id'
+                            required
+                        >
+                            @foreach ( $this->categories() as $category )
+                                <flux:select.option value="{{ $category->id }}" class="capitalize">{{ $category->name }}</flux:select.option>
+                            @endforeach
+                        </flux:select>
                         @error('category_id')
                             <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                         @enderror
@@ -187,7 +210,12 @@ new class extends Component
 
                     <div>
                         <flux:text class="mb-2">Amount</flux:text>
-                        <flux:input placeholder="Enter amount..." wire:model='amount' required/>
+                        <flux:input
+                            placeholder="Enter amount..."
+                            wire:model='amount'
+                            required
+                            type="number"
+                        />
                         @error('amount')
                             <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                         @enderror
@@ -195,9 +223,12 @@ new class extends Component
 
                     <div>
                         <div class="flex flex-row items-center mb-2 gap-2">
-                            <flux:text class="">Note <flux:badge size="sm" color="zinc" rounded>optional</flux:badge></flux:text>
+                            <flux:text>Note<flux:badge size="sm" color="zinc" rounded>optional</flux:badge></flux:text>
                         </div>
-                        <flux:textarea placeholder="Enter notes..." wire:model='description'/>
+                        <flux:textarea
+                            placeholder="Enter notes..."
+                            wire:model='description'
+                        />
                         @error('description')
                             <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                         @enderror
@@ -216,9 +247,6 @@ new class extends Component
                         >
                             Create Transaction
                         </flux:button>
-
-
-
                     </div>
 
                 </div>

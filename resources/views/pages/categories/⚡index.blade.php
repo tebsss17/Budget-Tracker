@@ -85,7 +85,7 @@ new class extends Component
 
         $validated['name'] = strtolower(trim($validated['name']));
 
-        $exists = auth()->user()->category()->where('name', $validated['name'])->exists();
+        $exists = auth()->user()->category()->where('name', $validated['name'])->where('id', '!=', $this->selectedCategory->id)->exists();
 
         if($exists)
         {
