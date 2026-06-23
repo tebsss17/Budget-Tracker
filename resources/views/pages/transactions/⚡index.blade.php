@@ -8,6 +8,7 @@ new class extends Component
     // VARIABLES
     public $showAddModal = false;
     public $showEditModal = false;
+    public $showViewModal = false;
 
     public $category_id = '';
     public $amount = '';
@@ -98,6 +99,20 @@ new class extends Component
         ]);
         $this->resetErrorBag();
         $this->showEditModal = false;
+    }
+
+    public function viewModal($id)
+    {
+        $this->selectedTransaction = Auth::user()->transaction()->findOrFail($id);
+
+        $this->category_id = $this->selectedTransaction->category_id;
+        $this->amount = $this->selectedTransaction->amount;
+        $this->type = $this->selectedTransaction->type;
+        $this->description = $this->selectedTransaction->description;
+        $this->transaction_date = $this->selectedTransaction->transaction_date;
+
+        $this->showViewModal = true;
+
     }
 
 
@@ -193,15 +208,14 @@ new class extends Component
                             <flux:button
                                 wire:click='editModal({{ $transaction->id }})'
                                 variant="filled"
-                                icon="pencil-square"
+                                icon="eye"
                             >
                                 Edit
                             </flux:button>
 
                             <flux:button
-                                wire:click='deleteModal({{ $transaction->id }})'
-                                variant="danger"
-                                icon="eye"
+                                wire:click='viewModal({{ $transaction->id }})'
+                                icon="pencil-square"
                             >
                                 Show
                             </flux:button>
