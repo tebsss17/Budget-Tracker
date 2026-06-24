@@ -203,32 +203,24 @@ new class extends Component
         </flux:button>
     </div>
 
-    {{-- KPI Cards --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <x-card>te</x-card>
-        <x-card>tes</x-card>
-        <x-card>tet</x-card>
-    </div>
-
     {{-- Filter --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 ">
-        <div>
-            <flux:select wire:model.live='filterType' placeholder="All Types...">
+    <div class="flex flex-col md:flex-row gap-4">
+        <div class="md:max-w-sm md:flex-1">
+            <flux:select wire:model.live='filterType' placeholder="All Types..." >
                 <flux:select.option value="">All Types</flux:select.option>
                 <flux:select.option value="Income">Income</flux:select.option>
                 <flux:select.option value="Expense">Expense</flux:select.option>
             </flux:select>
         </div>
 
-        <div>
-            <flux:select wire:model.live='filterCategory' placeholder="All Categories...">
+        <div class="md:max-w-sm md:flex-1">
+            <flux:select wire:model.live='filterCategory' placeholder="All Categories..." >
                 <flux:select.option value="">All Categories</flux:select.option>
                 @foreach ($this->categories() as $category)
                     <flux:select.option value="{{ $category->id }}" class="capitalize">{{ $category->name }}</flux:select.option>
                 @endforeach
             </flux:select>
         </div>
-
     </div>
 
     {{-- Main Section --}}
