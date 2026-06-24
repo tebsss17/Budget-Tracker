@@ -18,6 +18,8 @@ new class extends Component
 
     public $selectedTransaction = '';
 
+    public $filterCategory = '';
+    public $filterType = '';
 
     // QUERY FUNCTIONS
     public function mount()
@@ -30,6 +32,12 @@ new class extends Component
         return Auth::user()
             ->transaction()
             ->with('category')
+            ->when($this->filterType, function($query){
+                $query->where('type', $this->filterType);
+            })
+            ->when($this->filterCategory, function($query){
+                $query->where('category_id', $this->filterCategory);
+            })
             ->orderBy('transaction_date', 'desc')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -203,7 +211,23 @@ new class extends Component
     </div>
 
     {{-- Filter --}}
-    <div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+        <div>
+            <flux:select wire:model.live='filterType' placeholder="All Types...">
+                <flux:select.option value="">All Types</flux:select.option>
+                <flux:select.option value="Income">Income</flux:select.option>
+                <flux:select.option value="Expense">Expense</flux:select.option>
+            </flux:select>
+        </div>
+
+        <div>
+            <flux:select wire:model.live='filterCategory' placeholder="All Categories...">
+                <flux:select.option value="">All Categories</flux:select.option>
+                @foreach ($this->categories() as $category)
+                    <flux:select.option value="{{ $category->id }}" class="capitalize">{{ $category->name }}</flux:select.option>
+                @endforeach
+            </flux:select>
+        </div>
 
     </div>
 
@@ -430,15 +454,15 @@ new class extends Component
 
                 <div class="space-y-6">
                     <div>
-
+                        <p>{{ $selectedTransaction->category->name }}</p>
                     </div>
 
                     <div>
-
+                        {{ $amount }}
                     </div>
 
                     <div>
-
+                        {{ date('m-d-Y', strtotime($transaction_date))  }}
                     </div>
 
                     <div>
