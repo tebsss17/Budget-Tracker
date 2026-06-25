@@ -1,10 +1,11 @@
 <?php
 
 use Livewire\Component;
-use App\Models\Transaction;
+use Flux\Flux;
 
 new class extends Component
 {
+
     // VARIABLES
     public $showAddModal = false;
     public $showEditModal = false;
@@ -48,20 +49,6 @@ new class extends Component
         return Auth::user()->category()->orderBy('name')->get();
     }
 
-    public function getStatsProperty()
-    {
-        $transactions = $this->transactions();
-
-        $income = $transactions->where('type', 'income')->sum('amount');
-        $expense = $transactions->where('type', 'expense')->sum('amount');
-        $balance = $income - $expense;
-
-        return[
-            'income' => $income,
-            'expense' => $expense,
-            'balance' => $balance,
-        ];
-    }
 
 
     // MODAL FUNCTIONS
@@ -149,7 +136,10 @@ new class extends Component
 
         Auth::user()->transaction()->create($validated);
 
+        Flux::toast(variant: 'success', text: 'Transaction Edited Successfully!');
+
         $this->closeAddModal();
+
     }
 
     public function editTransaction()
@@ -165,7 +155,11 @@ new class extends Component
 
         $this->selectedTransaction->update($validated);
 
+        Flux::toast(variant: 'success', text: 'Transaction Edited Successfully!');
+
         $this->closeEditModal();
+
+
     }
 };
 ?>
@@ -351,7 +345,7 @@ new class extends Component
                         Create Transaction
                     </flux:heading>
 
-                    <flux:button wire:click='closeAddModal'>
+                    <flux:button wire:click='closeEditModal'>
                         X
                     </flux:button>
                 </div>
@@ -480,7 +474,6 @@ new class extends Component
             </form>
         </x-popup>
     @endif
-
 
 
 </div>

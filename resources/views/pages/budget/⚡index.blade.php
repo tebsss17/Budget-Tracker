@@ -228,7 +228,7 @@ new class extends Component
 
         </div>
 
-        {{-- List of budgets --}}
+        {{-- Main Section --}}
         <div>
             <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6">
                 @forelse ($this->budgets() as $budget)
