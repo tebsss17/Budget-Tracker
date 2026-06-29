@@ -247,6 +247,7 @@ new class extends Component
 
     {{-- Main section --}}
     <div>
+
         {{-- Filters --}}
         <div class="flex md:flex-row flex-col gap-4">
             <div class="md:max-w-sm md:flex-1">

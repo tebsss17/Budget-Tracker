@@ -12,6 +12,10 @@ new class extends Component
     public $showEditModal = false;
     public $showDeleteModal = false;
 
+    public $filteredType = '';
+
+
+    // MODAL FUNCTIONS
     public function addModal()
     {
         $this->showAddModal = true;
@@ -53,6 +57,9 @@ new class extends Component
         $this->showDeleteModal = false;
     }
 
+
+
+    // CRUD FUNCTIONS
     public function addCategory()
     {
         $validated = $this->validate([
@@ -105,9 +112,16 @@ new class extends Component
         $this->closeDeleteModal();
     }
 
+
+
+    // QUERY FUNCTIONS
     public function categories()
     {
-        return auth()->user()->category;
+        return Auth::user()->category()
+            ->when($this->filteredType, function($query){
+                $query->where('type', $this->filteredType);
+            })
+            ->get();
     }
 };
 ?>
@@ -148,7 +162,18 @@ new class extends Component
 
     {{-- Main Section --}}
     <div>
-        <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6">
+
+        {{-- Filter --}}
+        <div class="md:max-w-sm">
+            <flux:select wire:model.live='filteredType'>
+                <flux:select.option value="">All Types</flux:select.option>
+                <flux:select.option value="Income">Income</flux:select.option>
+                <flux:select.option value="Expense">Expense</flux:select.option>
+            </flux:select>
+        </div>
+
+        {{-- Main --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 mt-20">
             @forelse ($this->categories() as $category)
                 <flux:card wire:key='category-{{ $category->id }}'>
                     <p class="capitalize">{{ $category->name }}</p>
@@ -207,7 +232,7 @@ new class extends Component
                         <flux:text class="mb-2">Type of Category</flux:text>
                         <flux:select wire:model='type' placeholder="Select type of category..." required>
                             <flux:select.option>Income</flux:select.option>
-                            <flux:select.option>Expenses</flux:select.option>
+                            <flux:select.option>Expense</flux:select.option>
                         </flux:select>
                         @error('type')
                             <flux:text color="red">{{ $message }}</flux:text>
@@ -258,7 +283,7 @@ new class extends Component
                         <flux:text class="mb-2">Type of Category</flux:text>
                         <flux:select wire:model='type' placeholder="Select type of category..." required>
                             <flux:select.option>Income</flux:select.option>
-                            <flux:select.option>Expenses</flux:select.option>
+                            <flux:select.option>Expense</flux:select.option>
                         </flux:select>
                         @error('type')
                             <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
