@@ -51,6 +51,8 @@ new class extends Component
 
 
 
+
+
     // MODAL FUNCTIONS
     public function addModal()
     {
@@ -136,7 +138,7 @@ new class extends Component
 
         Auth::user()->transaction()->create($validated);
 
-        Flux::toast(variant: 'success', text: 'Transaction Edited Successfully!');
+        Flux::toast(variant: 'success', text: 'Transaction Created Successfully!');
 
         $this->closeAddModal();
 
@@ -342,7 +344,7 @@ new class extends Component
             <form wire:submit='editTransaction' class="space-y-6">
                 <div class="flex flex-row justify-between items-center">
                     <flux:heading size="xl">
-                        Create Transaction
+                        Update Transaction no. {{ $selectedTransaction->id }}
                     </flux:heading>
 
                     <flux:button wire:click='closeEditModal'>
@@ -415,7 +417,7 @@ new class extends Component
                             type="submit"
                             icon="plus-circle"
                         >
-                            Create Transaction
+                            Update Transaction
                         </flux:button>
                     </div>
 

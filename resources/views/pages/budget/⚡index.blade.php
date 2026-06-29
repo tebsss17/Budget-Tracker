@@ -13,10 +13,14 @@ new class extends Component
     public $category_id = '';
     public $amount_limit = '';
 
-
     public $selectedDate = '';
     public $selectedBudget = null;
     public $editDate ='';
+
+    public $filteredMonth = '';
+    public $filteredYear = '';
+
+
 
 
     // QUERY FUNCTIONS
@@ -30,6 +34,12 @@ new class extends Component
         return Auth::user()
             ->budget()
             ->with('category')
+            ->when($this->filteredMonth, function($query){
+                $query->where('month', $this->filteredMonth);
+            })
+            ->when($this->filteredYear, function($query){
+                $query->where('year', $this->filteredYear);
+            })
             ->orderBy('month', 'desc')
             ->orderBy('year', 'desc')
             ->get();
@@ -40,6 +50,20 @@ new class extends Component
         return Auth::user()->category()->orderBy('name')->get();
     }
 
+    public function years()
+    {
+        return Auth::user()
+            ->budget()
+            ->select('year')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+    }
+
+
+
+
+    // MODAL FUNCTIONS
     public function addModal()
     {
         $this->showAddModal = true;
@@ -224,12 +248,30 @@ new class extends Component
     {{-- Main section --}}
     <div>
         {{-- Filters --}}
-        <div>
+        <div class="flex md:flex-row flex-col gap-4">
+            <div class="md:max-w-sm md:flex-1">
+                <flux:select wire:model.live='filteredMonth'>
+                    <flux:select.option value="">All Months</flux:select.option>
+                        @foreach (range(1,12) as $month)
+                            <flux:select.option value="{{ $month }}">
+                                {{ date('F', mktime(0,0,0,$month,1)) }}
+                            </flux:select.option>
+                        @endforeach
+                </flux:select>
+            </div>
 
+            <div class="md:max-w-sm md:flex-1">
+                <flux:select wire:model.live='filteredYear'>
+                    <flux:select.option value="">All Years</flux:select.option>
+                    @foreach ($this->years() as $year)
+                        <flux:select.option value="{{ $year }}">{{ $year }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+            </div>
         </div>
 
         {{-- Main Section --}}
-        <div>
+        <div class="mt-20">
             <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6">
                 @forelse ($this->budgets() as $budget)
                     <flux:card wire:key='budget-{{ $budget->id }}'>
