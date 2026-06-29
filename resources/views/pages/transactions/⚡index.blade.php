@@ -41,7 +41,7 @@ new class extends Component
             })
             ->orderBy('transaction_date', 'desc')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
     }
 
     public function categories()
@@ -477,5 +477,7 @@ new class extends Component
         </x-popup>
     @endif
 
-
+    <div class="mt-6">
+        {{ $this->transactions()->links() }}
+    </div>
 </div>

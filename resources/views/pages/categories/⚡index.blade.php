@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use App\Models\Category;
+use Flux\Flux;
 
 new class extends Component
 {
@@ -79,6 +80,8 @@ new class extends Component
 
         auth()->user()->category()->create($validated);
 
+        Flux::toast(variant: 'success', text: 'Category Created Successfully!');
+
         $this->closeAddModal();
 
     }
@@ -102,12 +105,16 @@ new class extends Component
 
         $this->selectedCategory->update($validated);
 
+        Flux::toast(variant: 'success', text: 'Category Edited Successfully!');
+
         $this->closeEditModal();
     }
 
     public function deleteCategory()
     {
         $this->selectedCategory->delete();
+
+        Flux::toast(variant: 'success', text: 'Category Deleted Successfully!');
 
         $this->closeDeleteModal();
     }
@@ -121,7 +128,7 @@ new class extends Component
             ->when($this->filteredType, function($query){
                 $query->where('type', $this->filteredType);
             })
-            ->get();
+            ->paginate(10);
     }
 };
 ?>
@@ -351,5 +358,64 @@ new class extends Component
             </form>
         </x-popup>
     @endif
+
+    <div class="mt-6">
+        {{ $this->categories()->links() }}
+    </div>
+
+
+
+    <div class="space-y-4 mt-8">
+    @forelse($this->categories() as $category)
+        <flux:card
+            wire:key="category-{{ $category->id }}"
+            class="border-l-4 {{ $category->type == 'Income'
+                ? 'border-green-500'
+                : 'border-red-500' }}"
+        >
+
+            <div class="flex items-start justify-between">
+
+                <div>
+                    <h3 class="font-semibold text-lg capitalize">
+                        {{ $category->name }}
+                    </h3>
+
+                    <span class="
+                        inline-flex items-center mt-2 px-2 py-1 rounded-full text-xs
+                        {{ $category->type == 'Income'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-red-100 text-red-700' }}
+                    ">
+                        {{ $category->type }}
+                    </span>
+                </div>
+
+                <div class="flex gap-2">
+                    <flux:button
+                        size="sm"
+                        icon="pencil-square"
+                        wire:click="editModal({{ $category->id }})"
+                    />
+
+                    <flux:button
+                        size="sm"
+                        variant="danger"
+                        icon="trash"
+                        wire:click="deleteModal({{ $category->id }})"
+                    />
+                </div>
+
+            </div>
+
+        </flux:card>
+    @empty
+
+        <flux:card class="text-center py-10">
+            No categories yet.
+        </flux:card>
+
+    @endforelse
+</div>
 
 </div>

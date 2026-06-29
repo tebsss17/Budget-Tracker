@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use App\Models\Budget;
+use Flux\Flux;
 
 new class extends Component
 {
@@ -19,7 +20,6 @@ new class extends Component
 
     public $filteredMonth = '';
     public $filteredYear = '';
-
 
 
 
@@ -42,7 +42,7 @@ new class extends Component
             })
             ->orderBy('month', 'desc')
             ->orderBy('year', 'desc')
-            ->get();
+            ->paginate(10);
     }
 
     public function categories()
@@ -59,7 +59,6 @@ new class extends Component
             ->orderBy('year', 'desc')
             ->pluck('year');
     }
-
 
 
 
@@ -130,6 +129,7 @@ new class extends Component
     }
 
 
+
     // CRUD LOGIC
     public function setBudget()
     {
@@ -163,6 +163,8 @@ new class extends Component
                 'year' => $year,
                 'month' => $month,
             ]);
+
+        Flux::toast(variant: 'success', text: 'Budget Created successfully!');
 
         $this->closeAddModal();
     }
@@ -199,12 +201,16 @@ new class extends Component
             'month' => $month,
         ]);
 
+        Flux::toast(variant: 'success', heading: 'lets g', text: 'Budget Edited Successfully!');
+
         $this->closeEditModal();
     }
 
     public function deleteBudget()
     {
         $this->selectedBudget->delete();
+
+        Flux::toast(variant: 'success', text: 'Budget Deleted Successfully!');
 
         $this->closeDeleteModal();
     }
@@ -496,4 +502,8 @@ new class extends Component
             </form>
         </x-popup>
     @endif
+
+    <div class="mt-6">
+        {{ $this->budgets()->links() }}
+    </div>
 </div>
