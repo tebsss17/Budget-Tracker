@@ -14,12 +14,10 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->string('name');
-            $table->string('type');
+            $table->enum('type', ['Income', 'Expense']);
+            $table->string('icon');
             $table->timestamps();
-
-            $table->unique(['user_id', 'name']);
         });
     }
 
