@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use Flux\Flux;
+use App\Models\Category;
 
 new class extends Component
 {
@@ -46,7 +47,7 @@ new class extends Component
 
     public function categories()
     {
-        return Auth::user()->category()->orderBy('name')->get();
+        return Category::orderBy('name')->get();
     }
 
 
@@ -216,6 +217,7 @@ new class extends Component
                     <flux:select.option value="{{ $category->id }}" class="capitalize">{{ $category->name }}</flux:select.option>
                 @endforeach
             </flux:select>
+
         </div>
     </div>
 
@@ -226,6 +228,8 @@ new class extends Component
                 <flux:card wire:key='transaction-{{ $transaction->id }}'>
                     <p>{{ $transaction->type }}</p>
                     <p class="capitalize">{{ $transaction->category->name }}</p>
+                    <x-dynamic-component :component="'lucide-'.$transaction->category->icon" class="h-10"/>
+                        <p>{{ $transaction->category->icon }}</p>
                     <p>{{ $transaction->amount }}</p>
                     <div class="flex justify-end gap-2 mt-6">
                             <flux:button

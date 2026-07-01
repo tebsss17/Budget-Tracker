@@ -24,10 +24,6 @@
                         <flux:sidebar.item icon="banknotes" :href="route('budget')" :current="request()->routeIs('budget')" wire:navigate>
                             Budget
                         </flux:sidebar.item>
-
-                        <flux:sidebar.item icon="tag" :href="route('categories')" :current="request()->routeIs('categories')" wire:navigate>
-                            Categories
-                        </flux:sidebar.item>
                     </div>
                 </flux:sidebar.group>
 
