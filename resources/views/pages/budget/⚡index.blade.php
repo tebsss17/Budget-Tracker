@@ -3,7 +3,7 @@
 use Livewire\Component;
 use App\Models\Budget;
 use Flux\Flux;
-
+use App\Models\Category;
 new class extends Component
 {
     // VARIABLES
@@ -47,7 +47,7 @@ new class extends Component
 
     public function categories()
     {
-        return Auth::user()->category()->orderBy('name')->get();
+        return Category::orderBy('name')->get();
     }
 
     public function years()

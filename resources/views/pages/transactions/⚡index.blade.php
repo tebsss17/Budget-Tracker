@@ -228,7 +228,7 @@ new class extends Component
                 <flux:card wire:key='transaction-{{ $transaction->id }}'>
                     <p>{{ $transaction->type }}</p>
                     <p class="capitalize">{{ $transaction->category->name }}</p>
-                    <x-dynamic-component :component="'lucide-'.$transaction->category->icon" class="h-10"/>
+                    <x-dynamic-component :component="'lucide-'.$transaction->category->icon" class="h-5 w-5 "/>
                         <p>{{ $transaction->category->icon }}</p>
                     <p>{{ $transaction->amount }}</p>
                     <div class="flex justify-end gap-2 mt-6">
