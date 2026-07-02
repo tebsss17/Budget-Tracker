@@ -55,4 +55,23 @@ class User extends Authenticatable implements PasskeyUser
     {
         return $this->hasMany(Budget::class);
     }
+
+    public function totalIncome()
+    {
+        return $this->transaction()
+            ->where('type', 'Income')
+            ->sum('amount');
+    }
+
+    public function totalExpense()
+    {
+        return $this->transaction()
+            ->where('type', 'Expense')
+            ->sum('amount');
+    }
+
+    public function balance()
+    {
+        return $this->starting_balance + $this->totalIncome() - $this->totalExpense();
+    }
 }
