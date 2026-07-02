@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Marc Steven Nagamany',
             'email' => 'steven@gmail.com',
             'password' => Hash::make('tebteb17'),
+            'starting_balance' => 50000,
         ]);
 
         $this->call(CategorySeeder::class);
