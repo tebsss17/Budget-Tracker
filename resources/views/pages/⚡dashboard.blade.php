@@ -198,6 +198,7 @@ new class extends Component
                             variant="primary"
                             color="emerald"
                             icon="check-circle"
+                            wire:loading.attr='disabled'
                             class="w-full sm:w-auto"
                         >
                             Save & Continue
