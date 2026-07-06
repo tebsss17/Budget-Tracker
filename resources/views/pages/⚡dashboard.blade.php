@@ -49,7 +49,131 @@ new class extends Component
 };
 ?>
 
-<div>
+<div class="space-y-6">
+
+    {{-- Breadcrumbs --}}
+    <div>
+        <flux:breadcrumbs>
+            <flux:breadcrumbs.item>
+                Home
+            </flux:breadcrumbs.item>
+        </flux:breadcrumbs>
+    </div>
+
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        {{-- Greeting --}}
+        <div>
+            <flux:heading size="xl" class="font-bold">
+                Good {{ now()->format('A') == 'AM' ? 'Morning' : (now()->hour < 18 ? 'Afternoon' : 'Evening') }},
+                {{ auth()->user()->name }} 👋
+            </flux:heading>
+
+            <flux:text class="mt-1 text-zinc-500">
+                Here's an overview of your finances today.
+            </flux:text>
+        </div>
+
+        {{-- Current Date --}}
+        <div>
+            <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100 text-right">
+                {{ now()->format('F d, Y') }}
+            </p>
+
+            <p class="text-xs text-zinc-500 text-right">
+                {{ now()->format('l') }}
+            </p>
+        </div>
+    </div>
+
+    {{-- Main Section --}}
+    <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+        {{-- Total Balance --}}
+        <flux:card class="p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-zinc-500">Available Balance</p>
+
+                    <h2 class="mt-2 text-3xl font-bold tracking-tight">
+                        {{ Auth::user()->balance() }}
+                    </h2>
+
+                    <p class="mt-2 text-sm text-emerald-600">
+                        ↑ +₱2,350 this month
+                    </p>
+                </div>
+
+                <div class="rounded-xl bg-emerald-100 p-3 dark:bg-emerald-900/30">
+                    <x-lucide-wallet class="h-6 w-6 text-emerald-600" />
+                </div>
+            </div>
+        </flux:card>
+
+        {{-- Income --}}
+        <flux:card class="p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-zinc-500">Income</p>
+
+                    <h2 class="mt-2 text-3xl font-bold">
+                        ₱30,000.00
+                    </h2>
+
+                    <p class="mt-2 text-sm text-zinc-500">
+                        This month
+                    </p>
+                </div>
+
+                <div class="rounded-xl bg-green-100 p-3 dark:bg-green-900/30">
+                    <x-lucide-trending-up class="h-6 w-6 text-green-600" />
+                </div>
+            </div>
+        </flux:card>
+
+        {{-- Expenses --}}
+        <flux:card class="p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-zinc-500">Expenses</p>
+
+                    <h2 class="mt-2 text-3xl font-bold">
+                        ₱11,580.00
+                    </h2>
+
+                    <p class="mt-2 text-sm text-zinc-500">
+                        This month
+                    </p>
+                </div>
+
+                <div class="rounded-xl bg-red-100 p-3 dark:bg-red-900/30">
+                    <x-lucide-trending-down class="h-6 w-6 text-red-600" />
+                </div>
+            </div>
+        </flux:card>
+
+        {{-- Budget Used --}}
+        <flux:card class="p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-zinc-500">Budget Used</p>
+
+                    <h2 class="mt-2 text-3xl font-bold">
+                        72%
+                    </h2>
+
+                    <div class="mt-3 h-2 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
+                        <div class="h-full w-[72%] rounded-full bg-emerald-500"></div>
+                    </div>
+                </div>
+
+                <div class="rounded-xl bg-blue-100 p-3 dark:bg-blue-900/30">
+                    <x-lucide-target class="h-6 w-6 text-blue-600" />
+                </div>
+            </div>
+        </flux:card>
+
+    </div>
+
     {{-- Starting Balance Modal --}}
     @if ($step == 1)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
