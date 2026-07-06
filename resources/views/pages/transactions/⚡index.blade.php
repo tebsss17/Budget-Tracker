@@ -4,6 +4,7 @@ use Livewire\Component;
 use Flux\Flux;
 use App\Models\Category;
 
+
 new class extends Component
 {
 
@@ -133,6 +134,17 @@ new class extends Component
             'type' => 'required|string',
             'amount' => 'required|numeric|min:50',
             'description' => 'nullable|string|max:500',
+        ],[
+            'category_id.required' => 'Please select a category.',
+            'category_id.exists' => 'The selected category is invalid.',
+
+            'type.required' => 'Please select a transaction type.',
+
+            'amount.required' => 'Please enter an amount',
+            'amount.numeric' => 'The amount must be a  valid number.',
+            'amount.min' => 'The minimum transaction amount is ₱50.',
+
+            'description.max' => 'The description cannot exceed 500 characters.',
         ]);
 
         $validated['transaction_date'] = $this->transaction_date;
@@ -152,6 +164,17 @@ new class extends Component
             'type' => 'required|string',
             'amount' => 'required|numeric|min:50',
             'description' => 'nullable|string|max:500',
+        ],[
+            'category_id.required' => 'Please select a category.',
+            'category_id.exists' => 'The selected category is invalid.',
+
+            'type.required' => 'Please select a transaction type.',
+
+            'amount.required' => 'Please enter an amount',
+            'amount.numeric' => 'The amount must be a  valid number.',
+            'amount.min' => 'The minimum transaction amount is ₱50.',
+
+            'description.max' => 'The description cannot exceed 500 characters.',
         ]);
 
         $validated['transaction_date'] = $this->transaction_date;

@@ -56,6 +56,11 @@ class User extends Authenticatable implements PasskeyUser
         return $this->hasMany(Budget::class);
     }
 
+    public function category()
+    {
+        return $this->hasMany(Category::class);
+    }
+
     public function totalIncome()
     {
         return $this->transaction()
