@@ -61,6 +61,7 @@ new class extends Component
         $this->showViewModal = false;
 
         $this->resetForm();
+        $this->resetValidation();
     }
 
     public function addModal()

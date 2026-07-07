@@ -61,83 +61,109 @@ new class extends Component
     }
 
 
-
     // MODAL FUNCTIONS
+    public function closeModals()
+    {
+        $this->showAddModal = false;
+        $this->showEditModal = false;
+        $this->showDeleteModal = false;
+
+        $this->resetForm();
+    }
+
+    protected function loadBudget($id)
+    {
+        $this->selectedBudget = Auth::user()
+            ->budget()
+            ->findOrFail($id);
+
+        $formattedDate = str_pad($this->selectedBudget->month, 2, 0, STR_PAD_LEFT);
+
+        $this->category_id = $this->selectedBudget->category_id;
+        $this->amount_limit = $this->selectedBudget->amount_limit;
+        $this->editDate = "{$this->selectedBudget->year}-{$formattedDate}";
+    }
+
     public function addModal()
     {
         $this->showAddModal = true;
-    }
-
-    public function closeAddModal()
-    {
-        $this->reset([
-            'category_id',
-            'amount_limit',
-        ]);
-
-        $this->selectedDate = now()->format('Y-m');
-        $this->resetErrorBag();
-        $this->showAddModal = false;
     }
 
     public function editModal($id)
     {
         $this->selectedBudget = Budget::findOrFail($id);
 
-        $formattedDate = str_pad($this->selectedBudget->month, 2, 0, STR_PAD_LEFT);
-
-        $this->category_id = $this->selectedBudget->category_id;
-        $this->amount_limit = $this->selectedBudget->amount_limit;
-        $this->editDate = "{$this->selectedBudget->year}-{$formattedDate}";
+        $this->loadBudget($id);
 
         $this->showEditModal = true;
-    }
-
-    public function closeEditModal()
-    {
-        $this->reset([
-            'category_id',
-            'amount_limit'
-        ]);
-
-        $this->selectedDate = now()->format('Y-m');
-        $this->resetErrorBag();
-        $this->showEditModal = false;
     }
 
     public function deleteModal($id)
     {
         $this->selectedBudget = Budget::findOrFail($id);
 
-        $formattedDate = str_pad($this->selectedBudget->month, 2, 0, STR_PAD_LEFT);
-
-        $this->category_id = $this->selectedBudget->category_id;
-        $this->amount_limit = $this->selectedBudget->amount_limit;
-        $this->editDate = "{$this->selectedBudget->year}-{$formattedDate}";
+        $this->loadBudget($id);
 
         $this->showDeleteModal = true;
     }
 
-    public function closeDeleteModal()
+    public function resetForm()
     {
         $this->reset([
             'category_id',
             'amount_limit'
         ]);
 
-        $this->showDeleteModal = false;
+        $this->selectedBudget = null;
+
+        $this->selectedDate = now()->format('Y-m');
+
+        $this->resetErrorBag();
+        $this->resetValidation();
     }
 
 
 
     // CRUD LOGIC
+    protected function storeRules()
+    {
+        return [
+            'category_id' => 'required|exists:categories,id',
+            'amount_limit' => 'required|numeric|min:50',
+            'selectedDate' => 'required|date_format:Y-m',
+        ];
+    }
+
+    protected function updateRules()
+    {
+        return [
+            'category_id' => 'required|exists:categories,id',
+            'amount_limit' => 'required|numeric|min:50',
+            'editDate' => 'required|date_format:Y-m',
+        ];
+    }
+
+    protected function messages()
+    {
+        return [
+            'category_id.required' => 'Please select a category.',
+            'category_id.exists' => 'The selected category is invalid.',
+
+            'amount_limit.required' => 'Please enter a budget amount.',
+            'amount_limit.numeric' => 'The budget amount must be a valid number.',
+            'amount_limit.min' => 'The minimum budget amount is ₱50.',
+
+            'selectedDate.required' => 'Please select a month.',
+            'selectedDate.date_format' => 'Please select a valid month.',
+
+            'editDate.required' => 'Please select a month.',
+            'editDate.date_format' => 'Please select a valid month.',
+        ];
+    }
+
     public function setBudget()
     {
-        $this->validate([
-            'category_id' => 'required',
-            'amount_limit' => 'required|min:50|numeric',
-            'selectedDate' => 'required',
-        ]);
+        $this->validate($this->storeRules());
 
         $split = explode('-', $this->selectedDate);
         $year = $split[0];
@@ -166,16 +192,12 @@ new class extends Component
 
         Flux::toast(variant: 'success', text: 'Budget Created successfully!');
 
-        $this->closeAddModal();
+        $this->closeModals();
     }
 
     public function updateBudget()
     {
-        $this->validate([
-            'category_id' => 'required',
-            'amount_limit' => 'required|numeric|min:50',
-            'editDate' => 'required',
-        ]);
+        $this->validate($this->updateRules());
 
         $split = explode('-', $this->editDate);
         $year = $split[0];
@@ -201,9 +223,9 @@ new class extends Component
             'month' => $month,
         ]);
 
-        Flux::toast(variant: 'success', heading: 'lets g', text: 'Budget Edited Successfully!');
+        Flux::toast(variant: 'success', text: 'Budget Edited Successfully!');
 
-        $this->closeEditModal();
+        $this->closeModals();
     }
 
     public function deleteBudget()
@@ -212,7 +234,7 @@ new class extends Component
 
         Flux::toast(variant: 'success', text: 'Budget Deleted Successfully!');
 
-        $this->closeDeleteModal();
+        $this->closeModals();
     }
 
 };
@@ -323,14 +345,14 @@ new class extends Component
 
     {{-- Add Modal --}}
     @if ($showAddModal == true)
-        <x-popup close="closeAddModal">
+        <x-popup close="closeModals">
             <form wire:submit='setBudget' class="space-y-6">
                 <div class="flex flex-row justify-between items-center">
                     <flux:heading size="xl">
                         Set Budget
                     </flux:heading>
 
-                    <flux:button wire:click='closeAddModal'>
+                    <flux:button wire:click='closeModals'>
                         X
                     </flux:button>
                 </div>
@@ -375,7 +397,7 @@ new class extends Component
 
                     <div class="flex justify-end gap-2">
                         <flux:button
-                            wire:click='closeAddModal'
+                            wire:click='closeModals'
                         >
                             Cancel
                         </flux:button>
@@ -394,14 +416,14 @@ new class extends Component
 
     {{-- Edit Modal --}}
     @if ($showEditModal == true)
-        <x-popup close="closeEditModal">
+        <x-popup close="closeModals">
             <form wire:submit='updateBudget' class="space-y-6">
                 <div class="flex flex-row justify-between items-center">
                     <flux:heading size="xl">
                         Update {{ $selectedBudget->category->name }} budget
                     </flux:heading>
 
-                    <flux:button wire:click='closeEditModal'>
+                    <flux:button wire:click='closeModals'>
                         X
                     </flux:button>
                 </div>
@@ -446,7 +468,7 @@ new class extends Component
 
                     <div class="flex justify-end gap-2">
                         <flux:button
-                            wire:click='closeAddModal'
+                            wire:click='closeModals'
                         >
                             Cancel
                         </flux:button>
@@ -465,14 +487,14 @@ new class extends Component
 
     {{-- Delete Modal --}}
     @if ($showDeleteModal == true)
-        <x-popup close="closeDeleteModal">
+        <x-popup close="closeModals">
             <form wire:submit='deleteBudget' class="space-y-6">
                 <div class="flex flex-row justify-between items-center">
                     <flux:heading size="xl">
                         Delete {{ $selectedBudget->category->name }} budget
                     </flux:heading>
 
-                    <flux:button wire:click='closeDeleteModal'>
+                    <flux:button wire:click='closeModals'>
                         X
                     </flux:button>
                 </div>
@@ -486,7 +508,7 @@ new class extends Component
                 <div class="space-y-6">
                     <div class="flex justify-end gap-2">
                         <flux:button
-                            wire:click='closeDeleteModal'
+                            wire:click='closeModals'
                         >
                             Cancel
                         </flux:button>
