@@ -19,7 +19,7 @@ new class extends Component
     public $description = '';
     public $transaction_date = '';
 
-    public $selectedTransaction = '';
+    public $selectedTransaction = null;
 
     public $filterCategory = '';
     public $filterType = '';
@@ -53,9 +53,16 @@ new class extends Component
 
 
 
-
-
     // MODAL FUNCTIONS
+    public function closeModals()
+    {
+        $this->showAddModal = false;
+        $this->showEditModal = false;
+        $this->showViewModal = false;
+
+        $this->resetForm();
+    }
+
     public function addModal()
     {
         $this->type = 'Expense';
@@ -63,66 +70,31 @@ new class extends Component
         $this->showAddModal = true;
     }
 
-    public function closeAddModal()
-    {
-        $this->reset([
-            'category_id',
-            'amount',
-            'type',
-            'description',
-        ]);
-        $this->resetErrorBag();
-        $this->showAddModal = false;
-    }
-
     public function editModal($id)
     {
-        $this->selectedTransaction = Auth::user()->transaction()->findOrFail($id);
-
-        $this->category_id = $this->selectedTransaction->category_id;
-        $this->amount = $this->selectedTransaction->amount;
-        $this->type = $this->selectedTransaction->type;
-        $this->description = $this->selectedTransaction->description;
-        $this->transaction_date = $this->selectedTransaction->transaction_date;
+        $this->loadTransaction($id);
 
         $this->showEditModal = true;
     }
 
-    public function closeEditModal()
-    {
-        $this->reset([
-            'category_id',
-            'amount',
-            'type',
-            'description',
-        ]);
-        $this->resetErrorBag();
-        $this->showEditModal = false;
-    }
-
     public function viewModal($id)
     {
-        $this->selectedTransaction = Auth::user()->transaction()->findOrFail($id);
+        $this->loadTransaction($id);
+
+        $this->showViewModal = true;
+    }
+
+    protected function loadTransaction($id)
+    {
+        $this->selectedTransaction = Auth::user()
+            ->transaction()
+            ->findOrFail($id);
 
         $this->category_id = $this->selectedTransaction->category_id;
         $this->amount = $this->selectedTransaction->amount;
         $this->type = $this->selectedTransaction->type;
         $this->description = $this->selectedTransaction->description;
         $this->transaction_date = $this->selectedTransaction->transaction_date;
-
-        $this->showViewModal = true;
-    }
-
-    public function closeViewModal()
-    {
-        $this->reset([
-            'category_id',
-            'amount',
-            'type',
-            'description',
-        ]);
-        $this->resetErrorBag();
-        $this->showViewModal = false;
     }
 
 
@@ -137,7 +109,7 @@ new class extends Component
 
         Flux::toast(variant: 'success', text: 'Transaction Created Successfully!');
 
-        $this->closeAddModal();
+        $this->closeModals();
 
     }
 
@@ -151,10 +123,10 @@ new class extends Component
 
         Flux::toast(variant: 'success', text: 'Transaction Edited Successfully!');
 
-        $this->closeEditModal();
+        $this->closeModals();
     }
 
-    public function rules()
+    protected function rules()
     {
         return [
             'category_id' => 'required|exists:categories,id',
@@ -165,7 +137,7 @@ new class extends Component
         ];
     }
 
-    public function messages()
+    protected function messages()
     {
         return [
             'category_id.required' => 'Please select a category.',
@@ -179,6 +151,21 @@ new class extends Component
 
             'description.max' => 'The description cannot exceed 500 characters.',
         ];
+    }
+
+    protected function resetForm()
+    {
+        $this->reset([
+            'category_id',
+            'amount',
+            'description',
+            'selectedTransaction',
+        ]);
+
+        $this->type = 'Expense';
+        $this->transaction_date = now()->format('Y-m-d');
+
+        $this->resetErrorBag();
     }
 };
 ?>
@@ -272,14 +259,14 @@ new class extends Component
 
     {{-- Add Modal --}}
     @if ($showAddModal == true)
-        <x-popup close="closeAddModal">
+        <x-popup close="closeModals">
             <form wire:submit='addTransaction' class="space-y-6">
                 <div class="flex flex-row justify-between items-center">
                     <flux:heading size="xl">
                         Create Transaction
                     </flux:heading>
 
-                    <flux:button wire:click='closeAddModal'>
+                    <flux:button wire:click='closeModals'>
                         X
                     </flux:button>
                 </div>
@@ -340,7 +327,7 @@ new class extends Component
 
                     <div class="flex justify-end gap-2">
                         <flux:button
-                            wire:click='closeAddModal'
+                            wire:click='closeModals'
                         >
                             Cancel
                         </flux:button>
@@ -360,14 +347,14 @@ new class extends Component
 
     {{-- Edit Modal --}}
     @if ($showEditModal == true)
-        <x-popup close="closeEditModal">
+        <x-popup close="closeModals">
             <form wire:submit='editTransaction' class="space-y-6">
                 <div class="flex flex-row justify-between items-center">
                     <flux:heading size="xl">
                         Update Transaction no. {{ $selectedTransaction->id }}
                     </flux:heading>
 
-                    <flux:button wire:click='closeEditModal'>
+                    <flux:button wire:click='closeModals'>
                         X
                     </flux:button>
                 </div>
@@ -428,7 +415,7 @@ new class extends Component
 
                     <div class="flex justify-end gap-2">
                         <flux:button
-                            wire:click='closeEditModal'
+                            wire:click='closeModals'
                         >
                             Cancel
                         </flux:button>
@@ -448,14 +435,14 @@ new class extends Component
 
     {{-- View Modal --}}
     @if ($showViewModal == true)
-        <x-popup close="closeViewModal">
+        <x-popup close="closeModals">
             <form  class="space-y-6">
                 <div class="flex flex-row justify-between items-center">
                     <flux:heading size="xl">
                         View Transaction no. {{ $selectedTransaction->id }}
                     </flux:heading>
 
-                    <flux:button wire:click='closeViewModal'>
+                    <flux:button wire:click='closeModals'>
                         X
                     </flux:button>
                 </div>
@@ -472,26 +459,6 @@ new class extends Component
                     <div>
                         {{ date('m-d-Y', strtotime($transaction_date))  }}
                     </div>
-
-                    <div>
-
-                    </div>
-
-                    <div class="flex justify-end gap-2">
-                        <flux:button
-                            wire:click='closeViewModal'
-                        >
-                            Cancel
-                        </flux:button>
-
-                        <flux:button
-                            type="submit"
-                            icon="plus-circle"
-                        >
-                            Create Transaction
-                        </flux:button>
-                    </div>
-
                 </div>
             </form>
         </x-popup>
