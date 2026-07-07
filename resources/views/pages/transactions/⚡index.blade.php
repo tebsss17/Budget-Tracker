@@ -129,23 +129,7 @@ new class extends Component
     // CRUD FUNCTIONS
     public function addTransaction()
     {
-        $validated = $this->validate([
-            'category_id' => 'required|exists:categories,id',
-            'type' => 'required|string',
-            'amount' => 'required|numeric|min:50',
-            'description' => 'nullable|string|max:500',
-        ],[
-            'category_id.required' => 'Please select a category.',
-            'category_id.exists' => 'The selected category is invalid.',
-
-            'type.required' => 'Please select a transaction type.',
-
-            'amount.required' => 'Please enter an amount',
-            'amount.numeric' => 'The amount must be a  valid number.',
-            'amount.min' => 'The minimum transaction amount is ₱50.',
-
-            'description.max' => 'The description cannot exceed 500 characters.',
-        ]);
+        $validated = $this->validate();
 
         $validated['transaction_date'] = $this->transaction_date;
 
@@ -159,12 +143,31 @@ new class extends Component
 
     public function editTransaction()
     {
-        $validated = $this->validate([
+        $validated = $this->validate();
+
+        $validated['transaction_date'] = $this->transaction_date;
+
+        $this->selectedTransaction->update($validated);
+
+        Flux::toast(variant: 'success', text: 'Transaction Edited Successfully!');
+
+        $this->closeEditModal();
+    }
+
+    public function rules()
+    {
+        return [
             'category_id' => 'required|exists:categories,id',
             'type' => 'required|string',
             'amount' => 'required|numeric|min:50',
+            'transaction_date' => 'required|date',
             'description' => 'nullable|string|max:500',
-        ],[
+        ];
+    }
+
+    public function messages()
+    {
+        return [
             'category_id.required' => 'Please select a category.',
             'category_id.exists' => 'The selected category is invalid.',
 
@@ -175,17 +178,7 @@ new class extends Component
             'amount.min' => 'The minimum transaction amount is ₱50.',
 
             'description.max' => 'The description cannot exceed 500 characters.',
-        ]);
-
-        $validated['transaction_date'] = $this->transaction_date;
-
-        $this->selectedTransaction->update($validated);
-
-        Flux::toast(variant: 'success', text: 'Transaction Edited Successfully!');
-
-        $this->closeEditModal();
-
-
+        ];
     }
 };
 ?>
