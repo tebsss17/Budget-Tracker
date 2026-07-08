@@ -91,8 +91,6 @@ new class extends Component
 
     public function editModal($id)
     {
-        $this->selectedBudget = Budget::findOrFail($id);
-
         $this->loadBudget($id);
 
         $this->showEditModal = true;
@@ -100,8 +98,6 @@ new class extends Component
 
     public function deleteModal($id)
     {
-        $this->selectedBudget = Budget::findOrFail($id);
-
         $this->loadBudget($id);
 
         $this->showDeleteModal = true;

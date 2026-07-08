@@ -46,6 +46,62 @@ new class extends Component
 
         $this->step = 0;
     }
+
+
+    // QUERY FUNCTIONS
+    public function getIncomeThisMonthProperty()
+    {
+        return Auth::user()->transaction()
+            ->where('type', 'Income')
+            ->whereMonth('transaction_date', now()->month)
+            ->whereYear('transaction_date', now()->year)
+            ->sum('amount');
+    }
+
+    public function getExpenseThisMonthProperty()
+    {
+        return Auth::user()->transaction()
+            ->where('type', 'Expense')
+            ->whereMonth('transaction_date', now()->month)
+            ->whereYear('transaction_date', now()->year)
+            ->sum('amount');
+    }
+
+    public function getMonthlyBudgetProperty()
+    {
+        return Auth::user()->budget()
+            ->where('month', now()->month)
+            ->where('year', now()->year)
+            ->sum('amount_limit');
+    }
+
+    public function getBudgetPercentageProperty()
+    {
+        if($this->MonthlyBudget == 0) {
+            return 0;
+        }
+
+        return min(
+            ($this->ExpenseThisMonth / $this->MonthlyBudget) * 100, 100
+        );
+    }
+
+    public function budgetColor()
+    {
+        if($this->BudgetPercentage <= 30){
+            return 'emerald';
+        }
+
+        if($this->BudgetPercentage <= 50){
+            return 'line';
+        }
+
+        if($this->BudgetPercentage <= 75 ){
+            return 'amber';
+        }
+
+        return 'red';
+    }
 };
 ?>
 
@@ -86,7 +142,7 @@ new class extends Component
     </div>
 
     {{-- Main Section --}}
-    <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
 
         {{-- Total Balance --}}
         <flux:card class="p-6">
@@ -95,7 +151,7 @@ new class extends Component
                     <p class="text-sm text-zinc-500">Available Balance</p>
 
                     <h2 class="mt-2 text-3xl font-bold tracking-tight">
-                        {{ Auth::user()->balance() }}
+                        ₱ {{ number_format(Auth::user()->balance(), 2) }}
                     </h2>
 
                     <p class="mt-2 text-sm text-emerald-600">
@@ -116,7 +172,7 @@ new class extends Component
                     <p class="text-sm text-zinc-500">Income</p>
 
                     <h2 class="mt-2 text-3xl font-bold">
-                        ₱30,000.00
+                        ₱ {{ number_format($this->IncomeThisMonth, 2) }}
                     </h2>
 
                     <p class="mt-2 text-sm text-zinc-500">
@@ -137,7 +193,7 @@ new class extends Component
                     <p class="text-sm text-zinc-500">Expenses</p>
 
                     <h2 class="mt-2 text-3xl font-bold">
-                        ₱11,580.00
+                        ₱ {{ number_format($this->ExpenseThisMonth, 2) }}
                     </h2>
 
                     <p class="mt-2 text-sm text-zinc-500">
@@ -158,12 +214,10 @@ new class extends Component
                     <p class="text-sm text-zinc-500">Budget Used</p>
 
                     <h2 class="mt-2 text-3xl font-bold">
-                        72%
+                        {{ round($this->BudgetPercentage) }}%
                     </h2>
 
-                    <div class="mt-3 h-2 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
-                        <div class="h-full w-[72%] rounded-full bg-emerald-500"></div>
-                    </div>
+                    <flux:progress value="{{ $this->BudgetPercentage }}" color="{{ $this->budgetColor() }}"  class="h-3 mt-3" max="100"></flux:progress>
                 </div>
 
                 <div class="rounded-xl bg-blue-100 p-3 dark:bg-blue-900/30">
@@ -174,7 +228,7 @@ new class extends Component
     </div>
 
     {{-- Progress and Transaction Cards --}}
-    <div class="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-3">
+    <div class="mt-10 grid grid-cols-1 gap-6 xl:grid-cols-3">
 
         {{-- Budget Progress --}}
         <flux:card class="xl:col-span-2 p-6">
@@ -190,6 +244,7 @@ new class extends Component
             </div>
 
             <div class="mt-6 space-y-6">
+
                 {{-- Food --}}
                 <div>
                     <div class="mb-2 flex items-center justify-between">
@@ -355,7 +410,7 @@ new class extends Component
     </div>
 
     {{-- Monthy Spending Analytics --}}
-    <div class="mt-6">
+    <div class="mt-10">
 
         <flux:card class="p-6">
 
