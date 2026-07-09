@@ -93,7 +93,7 @@ new class extends Component
         }
 
         if($this->BudgetPercentage <= 50){
-            return 'line';
+            return 'lime';
         }
 
         if($this->BudgetPercentage <= 75 ){
@@ -256,20 +256,43 @@ new class extends Component
 
                 {{-- Food Budget --}}
                 @forelse ($this->getBudgetProgress() as $budget)
-                    <div class="flex items-start justify-between mb-3 ">
-                        <div class="rounded-xl p-2 {{ $budget->category->bg_color }}">
-                            <x-dynamic-component
-                                :component="'lucide-'.$budget->category->icon"
-                                class="size-5 {{ $budget->category->text_color }}"
-                            />
+                    <div class="flex items-start justify-between mb-3">
+
+                        <div class="flex items-center gap-3">
+
+                            {{-- Category Icon and Color --}}
+                            <div class="rounded-xl p-2 {{ $budget->category->bg_color }}">
+                                <x-dynamic-component
+                                    :component="'lucide-'.$budget->category->icon"
+                                    class="size-5 {{ $budget->category->text_color }}"
+                                />
+                            </div>
+
+                            {{-- Amount Indicator --}}
+                            <div>
+                                <p class="font-semibold capitalize">
+                                    {{ $budget->category->name }}
+                                </p>
+
+                                <p class="text-sm text-zinc-500">
+                                    ₱ {{ number_format($budget->spent(), 2) }}
+                                    /
+                                    ₱ {{ number_format($budget->amount_limit, 2) }}
+                                </p>
+                            </div>
                         </div>
 
-                        <div>
-                            <p class="font-semibold capitalize">
-                                {{ $budget->category->name }}
+                        {{-- Percentage --}}
+                        <div class="text-right">
+                            <p class="font-semibold {{ $budget->textColor() }}">
+                                {{ round($budget->progress()) }}%
                             </p>
                         </div>
 
+                        {{-- Progress Bar --}}
+                        <div>
+
+                        </div>
                     </div>
                 @empty
 
