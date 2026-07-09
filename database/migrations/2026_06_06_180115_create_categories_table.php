@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->enum('type', ['Income', 'Expense']);
             $table->string('icon');
+            $table->string('color');
             $table->timestamps();
         });
     }

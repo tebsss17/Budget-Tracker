@@ -102,6 +102,15 @@ new class extends Component
 
         return 'red';
     }
+
+    public function getBudgetProgress()
+    {
+        return Auth::user()->budget()
+            ->with('category')
+            ->where('month', now()->month)
+            ->where('year', now()->year)
+            ->get();
+    }
 };
 ?>
 
@@ -246,6 +255,9 @@ new class extends Component
             <div class="mt-6 space-y-6">
 
                 {{-- Food --}}
+                @foreach ($this->getBudgetProgress() as $budget )
+                        {{ $budget->category }}
+                @endforeach
                 <div>
                     <div class="mb-2 flex items-center justify-between">
 
@@ -615,6 +627,7 @@ new class extends Component
             </form>
         </div>
     @endif
+
 
 
 </div>
