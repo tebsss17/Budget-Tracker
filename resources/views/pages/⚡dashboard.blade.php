@@ -254,92 +254,26 @@ new class extends Component
 
             <div class="mt-6 space-y-6">
 
-                {{-- Food --}}
-                @foreach ($this->getBudgetProgress() as $budget )
-                        {{ $budget->category }}
-                @endforeach
-                <div>
-                    <div class="mb-2 flex items-center justify-between">
-
-                        <div class="flex items-center gap-3">
-                            <div class="rounded-lg bg-orange-100 p-2 dark:bg-orange-900/30">
-                                <x-lucide-utensils class="h-4 w-4 text-orange-600"/>
-                            </div>
-
-                            <div>
-                                <p class="font-medium">Food</p>
-                                <p class="text-sm text-zinc-500">
-                                    ₱3,500 / ₱5,000
-                                </p>
-                            </div>
+                {{-- Food Budget --}}
+                @forelse ($this->getBudgetProgress() as $budget)
+                    <div class="flex items-start justify-between mb-3 ">
+                        <div class="rounded-xl p-2 {{ $budget->category->bg_color }}">
+                            <x-dynamic-component
+                                :component="'lucide-'.$budget->category->icon"
+                                class="size-5 {{ $budget->category->text_color }}"
+                            />
                         </div>
 
-                        <span class="font-semibold text-emerald-600">
-                            70%
-                        </span>
-
-                    </div>
-
-                    <div class="h-2 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
-                        <div class="h-full w-[70%] rounded-full bg-emerald-500"></div>
-                    </div>
-                </div>
-
-                {{-- Transportation --}}
-                <div>
-                    <div class="mb-2 flex items-center justify-between">
-
-                        <div class="flex items-center gap-3">
-                            <div class="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30">
-                                <x-lucide-car class="h-4 w-4 text-blue-600"/>
-                            </div>
-
-                            <div>
-                                <p class="font-medium">Transportation</p>
-                                <p class="text-sm text-zinc-500">
-                                    ₱800 / ₱2,000
-                                </p>
-                            </div>
+                        <div>
+                            <p class="font-semibold capitalize">
+                                {{ $budget->category->name }}
+                            </p>
                         </div>
 
-                        <span class="font-semibold text-amber-500">
-                            40%
-                        </span>
-
                     </div>
+                @empty
 
-                    <div class="h-2 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
-                        <div class="h-full w-[40%] rounded-full bg-amber-500"></div>
-                    </div>
-                </div>
-
-                {{-- Bills --}}
-                <div>
-                    <div class="mb-2 flex items-center justify-between">
-
-                        <div class="flex items-center gap-3">
-                            <div class="rounded-lg bg-purple-100 p-2 dark:bg-purple-900/30">
-                                <x-lucide-receipt class="h-4 w-4 text-purple-600"/>
-                            </div>
-
-                            <div>
-                                <p class="font-medium">Bills</p>
-                                <p class="text-sm text-zinc-500">
-                                    ₱5,000 / ₱5,000
-                                </p>
-                            </div>
-                        </div>
-
-                        <span class="font-semibold text-red-500">
-                            100%
-                        </span>
-
-                    </div>
-
-                    <div class="h-2 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
-                        <div class="h-full w-full rounded-full bg-red-500"></div>
-                    </div>
-                </div>
+                @endforelse
             </div>
         </flux:card>
 
@@ -627,7 +561,4 @@ new class extends Component
             </form>
         </div>
     @endif
-
-
-
 </div>

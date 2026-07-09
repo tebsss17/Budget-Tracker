@@ -15,103 +15,120 @@ class CategorySeeder extends Seeder
                 'name' => 'Food',
                 'type' => 'Expense',
                 'icon' => 'utensils-crossed',
-                'color' => 'orange'
+                'bg_color' => 'bg-orange-100 dark:bg-orange-900/30',
+                'text_color' => 'text-orange-600'
             ],
             [
                 'name' => 'Transportation',
                 'type' => 'Expense',
                 'icon' => 'car',
-                'color' => 'blue'
+                'bg_color' => 'bg-blue-100 dark:bg-blue-900/30',
+                'text_color' => 'text-blue-600'
             ],
             [
                 'name' => 'Shopping',
                 'type' => 'Expense',
                 'icon' => 'shopping-cart',
-                'color' => 'pink'
+                'bg_color' => 'bg-pink-100 dark:bg-pink-900/30',
+                'text_color' => 'text-pink-600'
             ],
             [
                 'name' => 'Bills',
                 'type' => 'Expense',
                 'icon' => 'receipt-text',
-                'color' => 'red'
+                'bg_color' => 'bg-red-100 dark:bg-red-900/30',
+                'text_color' => 'text-red-600'
             ],
             [
                 'name' => 'Rent',
                 'type' => 'Expense',
                 'icon' => 'house',
-                'color' => 'amber'
+                'bg_color' => 'bg-amber-100 dark:bg-amber-900/30',
+                'text_color' => 'text-amber-600'
             ],
             [
                 'name' => 'Utilities',
                 'type' => 'Expense',
                 'icon' => 'lightbulb',
-                'color' => 'yellow'
+                'bg_color' => 'bg-yellow-100 dark:bg-yellow-900/30',
+                'text_color' => 'text-yellow-600'
             ],
             [
                 'name' => 'Health',
                 'type' => 'Expense',
                 'icon' => 'heart-pulse',
-                'color' => 'emerald'
+                'bg_color' => 'bg-emerald-100 dark:bg-emerald-900/30',
+                'text_color' => 'text-emerald-600'
             ],
             [
                 'name' => 'Medicine',
                 'type' => 'Expense',
                 'icon' => 'pill',
-                'color' => 'lime'
+                'bg_color' => 'bg-lime-100 dark:bg-lime-900/30',
+                'text_color' => 'text-lime-600'
             ],
             [
                 'name' => 'Education',
                 'type' => 'Expense',
                 'icon' => 'school',
-                'color' => 'indigo'
+                'bg_color' => 'bg-indigo-100 dark:bg-indigo-900/30',
+                'text_color' => 'text-indigo-600'
             ],
             [
                 'name' => 'Entertainment',
                 'type' => 'Expense',
                 'icon' => 'clapperboard',
-                'color' => 'purple'
+                'bg_color' => 'bg-purple-100 dark:bg-purple-900/30',
+                'text_color' => 'text-purple-600'
             ],
             [
                 'name' => 'Travel',
                 'type' => 'Expense',
                 'icon' => 'plane',
-                'color' => 'sky'
+                'bg_color' => 'bg-sky-100 dark:bg-sky-900/30',
+                'text_color' => 'text-sky-600'
             ],
             [
                 'name' => 'Fuel',
                 'type' => 'Expense',
                 'icon' => 'fuel',
-                'color' => 'slate'
+                'bg_color' => 'bg-slate-100 dark:bg-slate-900/30',
+                'text_color' => 'text-slate-600'
             ],
             [
                 'name' => 'Pets',
                 'type' => 'Expense',
                 'icon' => 'paw-print',
-                'color' => 'teal'
+                'bg_color' => 'bg-teal-100 dark:bg-teal-900/30',
+                'text_color' => 'text-teal-600'
             ],
             [
                 'name' => 'Insurance',
                 'type' => 'Expense',
                 'icon' => 'shield-check',
-                'color' => 'cyan'
+                'bg_color' => 'bg-cyan-100 dark:bg-cyan-900/30',
+                'text_color' => 'text-cyan-600'
             ],
             [
                 'name' => 'Clothing',
                 'type' => 'Expense',
                 'icon' => 'shirt',
-                'color' => 'rose'
+                'bg_color' => 'bg-rose-100 dark:bg-rose-900/30',
+                'text_color' => 'text-rose-600'
             ],
             [
                 'name' => 'Miscellaneous',
                 'type' => 'Expense',
                 'icon' => 'circle-question-mark',
-                'color' => 'gray'
+                'bg_color' => 'bg-gray-100 dark:bg-gray-900/30',
+                'text_color' => 'text-gray-600'
             ],
             [
                 'name' => 'Savings',
                 'type' => 'Expense',
                 'icon' => 'piggy-bank',
-                'color' => 'emerald'
+                'bg_color' => 'bg-emerald-100 dark:bg-emerald-900/30',
+                'text_color' => 'text-emerald-600'
             ],
 
             // Income
@@ -119,31 +136,36 @@ class CategorySeeder extends Seeder
                 'name' => 'Salary',
                 'type' => 'Income',
                 'icon' => 'banknote-check',
-                'color' => 'green'
+                'bg_color' => 'bg-green-100 dark:bg-green-900/30',
+                'text_color' => 'text-green-600'
             ],
             [
                 'name' => 'Freelance',
                 'type' => 'Income',
                 'icon' => 'briefcase-business',
-                'color' => 'violet'
+                'bg_color' => 'bg-violet-100 dark:bg-violet-900/30',
+                'text_color' => 'text-violet-600'
             ],
             [
                 'name' => 'Business',
                 'type' => 'Income',
                 'icon' => 'store',
-                'color' => 'orange'
+                'bg_color' => 'bg-orange-100 dark:bg-orange-900/30',
+                'text_color' => 'text-orange-600'
             ],
             [
                 'name' => 'Investments',
                 'type' => 'Income',
                 'icon' => 'chart-spline',
-                'color' => 'blue'
+                'bg_color' => 'bg-blue-100 dark:bg-amber-blue/30',
+                'text_color' => 'text-blue-600'
             ],
             [
                 'name' => 'Other Income',
                 'type' => 'Income',
                 'icon' => 'wallet-cards',
-                'color' => 'zinc'
+                'bg_color' => 'bg-zinc-100 dark:bg-zinc-900/30',
+                'text_color' => 'text-zinc-600'
             ],
 
         ]);
