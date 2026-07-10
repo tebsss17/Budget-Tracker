@@ -112,6 +112,15 @@ new class extends Component
             ->orderBy('created_at','desc')
             ->get();
     }
+
+    public function getRecentTransaction()
+    {
+        return Auth::user()->transaction()
+            ->with('category')
+            ->latest('transaction_date')
+            ->take(5)
+            ->get();
+    }
 };
 ?>
 
@@ -303,6 +312,26 @@ new class extends Component
                         />
                     </div>
                 @empty
+                    <div class="flex flex-col items-center justify-center py-10 text-center">
+                        <div class="rounded-2xl bg-zinc-100 dark:bg-zinc-800 p-4">
+                            <x-lucide-piggy-bank class="size-8 text-zinc-500" />
+                        </div>
+
+                        <flux:heading size="sm" class="mt-4">
+                            No budgets this month
+                        </flux:heading>
+
+                        <flux:text class="mt-2 max-w-sm text-zinc-500">
+                            Set a monthly budget to track your spending progress and avoid overspending.
+                        </flux:text>
+
+                        <flux:button
+                            icon="plus-circle"
+                            class="mt-6"
+                        >
+                            Set Budget
+                        </flux:button>
+                    </div>
 
                 @endforelse
             </div>
@@ -322,66 +351,46 @@ new class extends Component
             </div>
 
             <div class="mt-6 space-y-5">
+                @forelse ($this->getRecentTransaction() as $recentTransaction )
+                    <div class="flex items-center justify-between">
 
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
+                        <div class="flex gap-3 items-center">
 
-                        <div class="rounded-lg bg-emerald-100 p-2 dark:bg-emerald-900/30">
-                            <x-lucide-briefcase class="h-4 w-4 text-emerald-600"/>
+                            <div class="rounded-xl p-2 {{ $recentTransaction->category->bg_color }}">
+                                <x-dynamic-component
+                                    :component="'lucide-'.$recentTransaction->category->icon"
+                                    class="size-5 {{ $recentTransaction->category->text_color }}"
+                                />
+                            </div>
+
+                            <div>
+                                <p class="font-semibold capitalize">{{ $recentTransaction->category->name }}</p>
+                                <p class="text-sm text-zinc-500">{{ $recentTransaction->description ?: 'No Description' }}</p>
+                            </div>
                         </div>
 
-                        <div>
-                            <p class="font-medium">Salary</p>
-                            <p class="text-xs text-zinc-500">
-                                Today
-                            </p>
-                        </div>
-                    </div>
+                        <div class="text-right">
+                            @if ($recentTransaction->type == 'Income')
+                                <p class="font-semibold text-emerald-500">
+                                    +₱ {{ number_format($recentTransaction->amount, 2) }}
+                                </p>
+                            @else
+                                <p class="font-semibold text-rose-500">
+                                    -₱ {{ number_format($recentTransaction->amount, 2) }}
+                                </p>
+                            @endif
 
-                    <span class="font-semibold text-emerald-600">
-                        +₱25,000
-                    </span>
-                </div>
+                            <div>
+                                <p class="text-sm text-zinc-500">
+                                    {{ date('F j, Y', strtotime($recentTransaction->transaction_date)) }}
+                                </p>
+                            </div>
 
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-
-                        <div class="rounded-lg bg-red-100 p-2 dark:bg-red-900/30">
-                            <x-lucide-utensils class="h-4 w-4 text-red-600"/>
-                        </div>
-
-                        <div>
-                            <p class="font-medium">Jollibee</p>
-                            <p class="text-xs text-zinc-500">
-                                Food
-                            </p>
-                        </div>
-                    </div>
-
-                    <span class="font-semibold text-red-500">
-                        -₱250
-                    </span>
-                </div>
-
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-
-                        <div class="rounded-lg bg-red-100 p-2 dark:bg-red-900/30">
-                            <x-lucide-fuel class="h-4 w-4 text-red-600"/>
-                        </div>
-
-                        <div>
-                            <p class="font-medium">Gasoline</p>
-                            <p class="text-xs text-zinc-500">
-                                Transportation
-                            </p>
                         </div>
                     </div>
+                @empty
 
-                    <span class="font-semibold text-red-500">
-                        -₱500
-                    </span>
-                </div>
+                @endforelse
             </div>
         </flux:card>
     </div>
