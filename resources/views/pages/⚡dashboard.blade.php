@@ -88,19 +88,19 @@ new class extends Component
 
     public function budgetColor()
     {
-        if($this->BudgetPercentage <= 30){
-            return 'emerald';
-        }
-
         if($this->BudgetPercentage <= 50){
-            return 'lime';
+            return 'progress-success';
         }
 
-        if($this->BudgetPercentage <= 75 ){
-            return 'amber';
+        if($this->BudgetPercentage <= 75){
+            return 'progress-info';
         }
 
-        return 'red';
+        if($this->BudgetPercentage <= 90 ){
+            return 'progress-warning';
+        }
+
+        return 'progress-error';
     }
 
     public function getBudgetProgress()
@@ -109,6 +109,7 @@ new class extends Component
             ->with('category')
             ->where('month', now()->month)
             ->where('year', now()->year)
+            ->orderBy('created_at','desc')
             ->get();
     }
 };
@@ -226,7 +227,11 @@ new class extends Component
                         {{ round($this->BudgetPercentage) }}%
                     </h2>
 
-                    <flux:progress value="{{ $this->BudgetPercentage }}" color="{{ $this->budgetColor() }}"  class="h-3 mt-3" max="100"></flux:progress>
+                    <x-mary-progress
+                        class="mt-2 h-4.5 {{ $this->budgetColor() }}"
+                        value="{{ $this->BudgetPercentage }}"
+                        max="100"
+                    />
                 </div>
 
                 <div class="rounded-xl bg-blue-100 p-3 dark:bg-blue-900/30">
@@ -256,43 +261,46 @@ new class extends Component
 
                 {{-- Food Budget --}}
                 @forelse ($this->getBudgetProgress() as $budget)
-                    <div class="flex items-start justify-between mb-3">
+                    <div>
 
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-start justify-between">
 
-                            {{-- Category Icon and Color --}}
-                            <div class="rounded-xl p-2 {{ $budget->category->bg_color }}">
-                                <x-dynamic-component
-                                    :component="'lucide-'.$budget->category->icon"
-                                    class="size-5 {{ $budget->category->text_color }}"
-                                />
+                            <div class="flex items-center gap-3">
+
+                                <div class="rounded-xl p-2 {{ $budget->category->bg_color }}">
+                                    <x-dynamic-component
+                                        :component="'lucide-'.$budget->category->icon"
+                                        class="size-5 {{ $budget->category->text_color }}"
+                                    />
+                                </div>
+
+                                <div>
+                                    <p class="font-semibold capitalize">
+                                        {{ $budget->category->name }}
+                                    </p>
+
+                                    <p class="text-sm text-zinc-500">
+                                        ₱{{ number_format($budget->spent(),2) }}
+                                        /
+                                        ₱{{ number_format($budget->amount_limit,2) }}
+                                    </p>
+                                </div>
+
                             </div>
 
-                            {{-- Amount Indicator --}}
-                            <div>
-                                <p class="font-semibold capitalize">
-                                    {{ $budget->category->name }}
-                                </p>
-
-                                <p class="text-sm text-zinc-500">
-                                    ₱ {{ number_format($budget->spent(), 2) }}
-                                    /
-                                    ₱ {{ number_format($budget->amount_limit, 2) }}
+                            <div class="text-right">
+                                <p class="font-semibold {{ $budget->textColor() }}">
+                                    {{ round($budget->progress()) }}%
                                 </p>
                             </div>
-                        </div>
-
-                        {{-- Percentage --}}
-                        <div class="text-right">
-                            <p class="font-semibold {{ $budget->textColor() }}">
-                                {{ round($budget->progress()) }}%
-                            </p>
-                        </div>
-
-                        {{-- Progress Bar --}}
-                        <div>
 
                         </div>
+
+                        <x-mary-progress
+                            class="mt-2 h-2 {{ $budget->progressColor() }}"
+                            value="{{ $budget->progress() }}"
+                            max="100"
+                        />
                     </div>
                 @empty
 

@@ -59,20 +59,30 @@ class Budget extends Model
     public function progressColor()
     {
         return match(true) {
-            $this->progress() <= 30 => 'bg-emerald-500',
-            $this->progress() <= 50 => 'bg-lime-500',
-            $this->progress() <= 75 => 'bg-amber-500',
-            default => 'bg-red-500'
+            $this->progress() <= 50 => 'progress-success',
+            $this->progress() <= 75 => 'progress-info',
+            $this->progress() <= 90 => 'progress-warning',
+            default => 'progress-error'
         };
     }
 
     public function textColor()
     {
         return match(true) {
-            $this->progress() <= 30 => 'text-emerald-500',
-            $this->progress() <= 50 => 'text-lime-500',
-            $this->progress() <= 75 => 'text-amber-500',
+            $this->progress() <= 50 => 'text-emerald-500',
+            $this->progress() <= 75 => 'text-sky-500',
+            $this->progress() <= 90 => 'text-amber-500',
             default => 'text-red-500'
+        };
+    }
+
+    public function progressBarrColor()
+    {
+        return match(true) {
+            $this->progress() <= 30 => 'bg-emerald-500',
+            $this->progress() <= 50 => 'bg-lime-500',
+            $this->progress() <= 75 => 'bg-amber-500',
+            default => 'bg-red-500'
         };
     }
 }
