@@ -9,6 +9,7 @@ new class extends Component
     public $step = 1;
     public $starting_balance = null;
 
+
     public function mount()
     {
         if(Auth::user()->starting_balance === null){
@@ -118,13 +119,18 @@ new class extends Component
         return Auth::user()->transaction()
             ->with('category')
             ->latest('transaction_date')
-            ->take(5)
+            ->take(10)
             ->get();
     }
 };
 ?>
 
 <div class="space-y-6">
+
+    {{-- Fetching monthly net change --}}
+    @php
+        $netChange = Auth::user()->monthlyNetChange();
+    @endphp
 
     {{-- Breadcrumbs --}}
     <div>
@@ -173,8 +179,10 @@ new class extends Component
                         ₱ {{ number_format(Auth::user()->balance(), 2) }}
                     </h2>
 
-                    <p class="mt-2 text-sm text-emerald-600">
-                        ↑ +₱2,350 this month
+                    <p class="mt-2 text-sm {{ $netChange >= 0 ? 'text-emerald-600' : 'text-rose-600' }}">
+                        {{ $netChange >= 0 ? '↑ +' : '↓ -' }}
+                        ₱ {{ number_format($netChange, 2)  }}
+                        this month
                     </p>
                 </div>
 
@@ -266,7 +274,7 @@ new class extends Component
                 </flux:button>
             </div>
 
-            <div class="mt-6 space-y-6">
+            <div class="mt-6 space-y-6 max-h-[500px] overflow-y-auto">
 
                 {{-- Food Budget --}}
                 @forelse ($this->getBudgetProgress() as $budget)
@@ -350,7 +358,7 @@ new class extends Component
                 </flux:button>
             </div>
 
-            <div class="mt-6 space-y-5">
+            <div class="mt-6 space-y-6 max-h-[500px] overflow-y-auto">
                 @forelse ($this->getRecentTransaction() as $recentTransaction )
                     <div class="flex items-center justify-between">
 
@@ -365,11 +373,11 @@ new class extends Component
 
                             <div>
                                 <p class="font-semibold capitalize">{{ $recentTransaction->category->name }}</p>
-                                <p class="text-sm text-zinc-500">{{ $recentTransaction->description ?: 'No Description' }}</p>
+                                <p class="text-sm text-zinc-500">{{ Str::limit($recentTransaction->description ?: 'No Description', 20) }}</p>
                             </div>
                         </div>
 
-                        <div class="text-right">
+                        <div class="text-right shrink-0">
                             @if ($recentTransaction->type == 'Income')
                                 <p class="font-semibold text-emerald-500">
                                     +₱ {{ number_format($recentTransaction->amount, 2) }}

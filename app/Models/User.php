@@ -79,4 +79,27 @@ class User extends Authenticatable implements PasskeyUser
     {
         return $this->starting_balance + $this->totalIncome() - $this->totalExpense();
     }
+
+    public function incomeThisMonth()
+    {
+        return $this->transaction()
+            ->where('type', 'Income')
+            ->whereMonth('transaction_date', now()->month)
+            ->whereYear('transaction_date', now()->year)
+            ->sum('amount');
+    }
+
+    public function expenseThisMonth()
+    {
+        return $this->transaction()
+            ->where('type', 'Expense')
+            ->whereMonth('transaction_date', now()->month)
+            ->whereYear('transaction_date', now()->year)
+            ->sum('amount');
+    }
+
+    public function monthlyNetChange()
+    {
+        return $this->incomeThisMonth() - $this->expenseThisMonth();
+    }
 }
