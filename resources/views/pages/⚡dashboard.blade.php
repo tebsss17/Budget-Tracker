@@ -269,7 +269,7 @@ new class extends Component
                     Budget Progress This Month
                 </flux:heading>
 
-                <flux:button variant="ghost" size="sm">
+                <flux:button variant="ghost" size="sm" href="{{ route('budgets') }}" wire:navigate>
                     View All
                 </flux:button>
             </div>
@@ -292,17 +292,30 @@ new class extends Component
                                 </div>
 
                                 <div>
-                                    <p class="font-semibold capitalize">
-                                        {{ $budget->category->name }}
-                                    </p>
+                                    <div class="flex items-center gap-2">
+                                        <p class="font-semibold capitalize">
+                                            {{ $budget->category->name }}
+                                        </p>
 
-                                    <p class="text-sm text-zinc-500">
-                                        ₱{{ number_format($budget->spent(),2) }}
-                                        /
-                                        ₱{{ number_format($budget->amount_limit,2) }}
-                                    </p>
+                                        {{-- Condtional over budget --}}
+                                        @if ($budget->isOverBudget())
+                                            <div class="inline-flex items-center rounded-lg bg-rose-100 dark:bg-rose-900/40 px-2 py-0.5 text-xs font-semibold text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50 animate-pulse">
+                                                <x-lucide-triangle-alert class="size-4 shrink-0 mr-1" />
+                                                Over Budget
+                                            </div>
+                                        @endif
+
+                                    </div>
+
+                                    <div>
+                                        <p class="text-sm text-zinc-500">
+                                            ₱{{ number_format($budget->spent(),2) }}
+                                            /
+                                            ₱{{ number_format($budget->amount_limit,2) }}
+                                        </p>
+                                    </div>
+
                                 </div>
-
                             </div>
 
                             <div class="text-right">
@@ -353,7 +366,7 @@ new class extends Component
                     Recent Transactions
                 </flux:heading>
 
-                <flux:button variant="ghost" size="sm">
+                <flux:button variant="ghost" size="sm" href="{{ route('transactions') }}">
                     View All
                 </flux:button>
             </div>

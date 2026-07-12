@@ -21,7 +21,7 @@
                             Transactions
                         </flux:sidebar.item>
 
-                        <flux:sidebar.item icon="banknotes" :href="route('budget')" :current="request()->routeIs('budget')" wire:navigate>
+                        <flux:sidebar.item icon="banknotes" :href="route('budgets')" :current="request()->routeIs('budgets')" wire:navigate>
                             Budget
                         </flux:sidebar.item>
                     </div>
