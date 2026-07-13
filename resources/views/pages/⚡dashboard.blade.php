@@ -8,6 +8,7 @@ new class extends Component
     // VARIRABLES
     public $step = 1;
     public $starting_balance = null;
+    public $chartRange = '3_months';
 
 
     public function mount()
@@ -120,6 +121,109 @@ new class extends Component
             ->with('category')
             ->latest('transaction_date')
             ->take(10)
+            ->get();
+    }
+
+    public function monthlySpendingChart()
+    {
+        return match ($this->chartRange){
+            '30_days' => $this->lastThirtyDaysChart(),
+            '3_months' => $this->lastThreeMonthsChart(),
+            '6_months' => $this->lastSixMonthsChart(),
+            'this_year' => $this->thisYearChart(),
+            'all' => $this->allTimeChart(),
+            default => collect(),
+        };
+    }
+
+    private function expenseQuery()
+    {
+        return Auth::user()->transaction()
+            ->where('type', 'Expense');
+    }
+
+    public function updateChartRange()
+    {
+        $this->dispatch(
+            'update-chart',
+
+            data: $this->monthlySpendingChart()
+        );
+    }
+
+    private function lastThirtyDaysChart()
+    {
+        return $this->expenseQuery()
+            ->whereDate(
+                'transaction_date', '>=', now()->subDays(29)
+            )
+            ->selectRaw('
+                DATE(transaction_date) as label,
+                SUM(amount) as total
+            ')
+            ->groupBy('label')
+            ->orderBy('label')
+            ->get();
+    }
+
+    private function lastThreeMonthsChart()
+    {
+        return $this->expenseQuery()
+            ->whereDate(
+                'transaction_date', '>=', now()->subMonths(2)->startOfMonth()
+            )
+            ->selectRaw('
+                EXTRACT(YEAR FROM transaction_date) as year,
+                EXTRACT(MONTH FROM transaction_date) as month,
+                SUM(amount) as total
+            ')
+            ->groupBy('year', 'month')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->get();
+    }
+
+    private function lastSixMonthsChart()
+    {
+        return $this->expenseQuery()
+            ->whereDate(
+                'transaction_date', '>=', now()->subMonths(5)->startOfMonth()
+            )
+            ->selectRaw('
+                EXTRACT(YEAR FROM transaction_date) as year,
+                EXTRACT(MONTH FROM transaction_date) as month,
+                SUM(amount) as total
+            ')
+            ->groupBy('year', 'month')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->get();
+    }
+
+    private function thisYearChart()
+    {
+        return $this->expenseQuery()
+            ->whereYear(
+                'transaction_date', now()->year
+            )
+            ->selectRaw('
+                EXTRACT(MONTH FROM transaction_date) as month,
+                SUM(amount) as total
+            ')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+    }
+
+    public function allTimeChart()
+    {
+        return $this->expenseQuery()
+            ->selectRaw('
+                EXTRACT(YEAR FROM transaction_date) as year,
+                SUM(amount) as total
+            ')
+            ->groupBy('year')
+            ->orderBy('year')
             ->get();
     }
 };
@@ -299,7 +403,7 @@ new class extends Component
 
                                         {{-- Condtional over budget --}}
                                         @if ($budget->isOverBudget())
-                                            <div class="inline-flex items-center rounded-lg bg-rose-100 dark:bg-rose-900/40 px-2 py-0.5 text-xs font-semibold text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50 animate-pulse">
+                                            <div class="    flex items-center rounded-lg bg-rose-100 dark:bg-rose-900/40 px-2 py-0.5 text-xs font-semibold text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50 animate-pulse">
                                                 <x-lucide-triangle-alert class="size-4 shrink-0 mr-1" />
                                                 Over Budget
                                             </div>
@@ -349,6 +453,7 @@ new class extends Component
                         <flux:button
                             icon="plus-circle"
                             class="mt-6"
+                            href="{{ route('budgets') }}"
                         >
                             Set Budget
                         </flux:button>
@@ -410,6 +515,27 @@ new class extends Component
                         </div>
                     </div>
                 @empty
+                    <div class="flex flex-col items-center justify-center py-10 text-center">
+                        <div class="rounded-2xl bg-zinc-100 dark:bg-zinc-800 p-4">
+                            <x-lucide-arrow-left-right class="size-8 text-zinc-500" />
+                        </div>
+
+                        <flux:heading size="sm" class="mt-4">
+                            No transaction found
+                        </flux:heading>
+
+                        <flux:text class="mt-2 max-w-sm text-zinc-500">
+                            Add your first income or expense to start tracking your finances.
+                        </flux:text>
+
+                        <flux:button
+                            icon="plus-circle"
+                            class="mt-6"
+                            href="{{ route('transactions') }}"
+                        >
+                            Create Transaction
+                        </flux:button>
+                    </div>
 
                 @endforelse
             </div>
@@ -433,30 +559,22 @@ new class extends Component
                     </flux:text>
                 </div>
 
-                <flux:select class="w-full sm:w-44">
-                    <option>This Year</option>
-                    <option>Last 6 Months</option>
-                    <option>Last 30 Days</option>
+                <flux:select class="w-full sm:w-44" wire:model='chartRange' wire:change='updateChartRange'>
+                    <flux:select.option value="all">All</flux:select.option>
+                    <flux:select.option value="30_days">30 Days</flux:select.option>
+                    <flux:select.option value="3_months">3 Months</flux:select.option>
+                    <flux:select.option value="6_months">6 Months</flux:select.option>
+                    <flux:select.option value="this_year">This Year</flux:select.option>
+
                 </flux:select>
 
             </div>
 
             <div class="mt-8 h-80 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 flex items-center justify-center">
-
-                <div class="text-center">
-
-                    <x-lucide-chart-column class="mx-auto h-14 w-14 text-zinc-400"/>
-
-                    <p class="mt-3 font-medium">
-                        Monthly Spending Chart
-                    </p>
-
-                    <p class="text-sm text-zinc-500">
-                        Chart.js will be displayed here.
-                    </p>
-
-                </div>
-
+                <canvas
+                    id="monthlySpendingChart"
+                    wire:ignore
+                ></canvas>
             </div>
 
         </flux:card>
@@ -623,3 +741,74 @@ new class extends Component
         </div>
     @endif
 </div>
+
+@script
+<script>
+        let spendingChart;
+
+// Helper function para gawing pangalan ng buwan ang buwan na numero (e.g., 1 -> Jan)
+const getMonthName = (monthNum) => {
+    if (!monthNum) return '';
+    const date = new Date();
+    date.setMonth(monthNum - 1);
+    return date.toLocaleString('default', { month: 'short' });
+};
+
+const renderChart = (data) => {
+    const ctx = document.getElementById('monthlySpendingChart');
+    if (!ctx) return;
+
+    // Gumawa ng labels base sa kung anong data structure ang bumalik
+    const labels = data.map(item => {
+        if (item.label) return item.label; // Para sa 30 Days query
+        if (item.month && item.year) return `${getMonthName(item.month)} ${item.year}`; // Para sa 3/6 Months
+        if (item.month) return getMonthName(item.month); // Para sa This Year
+        if (item.year) return item.year; // Para sa All Time
+        return '';
+    });
+
+    const chartData = data.map(item => item.total);
+
+    if (!spendingChart) {
+        spendingChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Monthly Spending',
+                        data: chartData,
+                        borderWidth: 3,
+                        tension: .4,
+                        fill: true,
+                        borderColor: '#10b981', // Emerald-500 para bumagay sa theme mo
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    } else {
+        spendingChart.data.labels = labels;
+        spendingChart.data.datasets[0].data = chartData;
+        spendingChart.update();
+    }
+};
+
+// I-render ang default chart sa unang load
+renderChart(@js($this->monthlySpendingChart()));
+
+// Makinig sa update-chart event mula sa Livewire
+Livewire.on('update-chart', ({ data }) => {
+    renderChart(data);
+});
+    </script>
+@endscript
