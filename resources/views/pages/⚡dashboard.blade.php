@@ -558,7 +558,7 @@ new class extends Component
                         Track your spending trend over the past months.
                     </flux:text>
                 </div>
-
+                {{-- Make this monthly for simplicity--}}
                 <flux:select class="w-full sm:w-44" wire:model='chartRange' wire:change='updateChartRange'>
                     <flux:select.option value="all">All</flux:select.option>
                     <flux:select.option value="30_days">30 Days</flux:select.option>
