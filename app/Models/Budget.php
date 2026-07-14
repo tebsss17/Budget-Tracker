@@ -40,7 +40,7 @@ class Budget extends Model
 
     public function remaining()
     {
-        return $this->amount_limit - $this->spent();
+        return max ($this->amount_limit - $this->spent, 0);
     }
 
     public function progress()
@@ -48,12 +48,12 @@ class Budget extends Model
         if($this->amount_limit == 0){
             return 0;
         }
-        return min($this->spent()/$this->amount_limit * 100, 100);
+        return min($this->spent / $this->amount_limit * 100, 100);
     }
 
     public function isOverBudget()
     {
-        return $this->spent() > $this->amount_limit;
+        return $this->spent > $this->amount_limit;
     }
 
     public function progressColor()

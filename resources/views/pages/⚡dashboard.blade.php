@@ -2,13 +2,13 @@
 
 use Livewire\Component;
 use Flux\Flux;
-
+use App\Models\Transaction;
 new class extends Component
 {
     // VARIRABLES
     public $step = 1;
     public $starting_balance = null;
-    public $chartRange = '3_months';
+    public $chartRange = '30_days';
 
 
     public function mount()
@@ -51,9 +51,13 @@ new class extends Component
 
 
     // QUERY FUNCTIONS
+    public function user()
+    {
+        return auth()->user();
+    }
     public function getIncomeThisMonthProperty()
     {
-        return Auth::user()->transaction()
+        return $this->user()->transaction()
             ->where('type', 'Income')
             ->whereMonth('transaction_date', now()->month)
             ->whereYear('transaction_date', now()->year)
@@ -62,7 +66,7 @@ new class extends Component
 
     public function getExpenseThisMonthProperty()
     {
-        return Auth::user()->transaction()
+        return $this->user()->transaction()
             ->where('type', 'Expense')
             ->whereMonth('transaction_date', now()->month)
             ->whereYear('transaction_date', now()->year)
@@ -71,13 +75,13 @@ new class extends Component
 
     public function getMonthlyBudgetProperty()
     {
-        return Auth::user()->budget()
+        return $this->user()->budget()
             ->where('month', now()->month)
             ->where('year', now()->year)
             ->sum('amount_limit');
     }
 
-    public function getBudgetPercentageProperty()
+    public function budgetPercentage()
     {
         if($this->MonthlyBudget == 0) {
             return 0;
@@ -90,15 +94,15 @@ new class extends Component
 
     public function budgetColor()
     {
-        if($this->BudgetPercentage <= 50){
+        if($this->budgetPercentage() <= 50){
             return 'progress-success';
         }
 
-        if($this->BudgetPercentage <= 75){
+        if($this->budgetPercentage() <= 75){
             return 'progress-info';
         }
 
-        if($this->BudgetPercentage <= 90 ){
+        if($this->budgetPercentage() <= 90 ){
             return 'progress-warning';
         }
 
@@ -107,17 +111,32 @@ new class extends Component
 
     public function getBudgetProgress()
     {
-        return Auth::user()->budget()
+        $budgets = $this->user()->budget()
             ->with('category')
             ->where('month', now()->month)
             ->where('year', now()->year)
             ->orderBy('created_at','desc')
             ->get();
+
+        $spent = Transaction::query()
+                ->where('user_id', auth()->id())
+                ->where('type', 'Expense')
+                ->whereMonth('transaction_date', now()->month)
+                ->whereYear('transaction_date', now()->year)
+                ->selectRaw('category_id, SUM(amount) as total')
+                ->groupBy('category_id')
+                ->pluck('total', 'category_id');
+
+        $budgets->each(function ($budget) use ($spent) {
+            $budget->spent = $spent[$budget->category_id] ?? 0;
+        });
+
+        return $budgets;
     }
 
     public function getRecentTransaction()
     {
-        return Auth::user()->transaction()
+        return $this->user()->transaction()
             ->with('category')
             ->latest('transaction_date')
             ->take(10)
@@ -138,7 +157,7 @@ new class extends Component
 
     private function expenseQuery()
     {
-        return Auth::user()->transaction()
+        return $this->user()->transaction()
             ->where('type', 'Expense');
     }
 
@@ -226,6 +245,14 @@ new class extends Component
             ->orderBy('year')
             ->get();
     }
+
+    public function fetchChartData($range)
+{
+    $this->chartRange = $range;
+
+    // Ibalik agad ang data bilang pure JSON response, walang UI renders!
+    return response()->json($this->monthlySpendingChart());
+}
 };
 ?>
 
@@ -345,12 +372,12 @@ new class extends Component
                     <p class="text-sm text-zinc-500">Budget Used</p>
 
                     <h2 class="mt-2 text-3xl font-bold">
-                        {{ round($this->BudgetPercentage) }}%
+                        {{ round($this->budgetPercentage()) }}%
                     </h2>
 
                     <x-mary-progress
                         class="mt-2 h-4.5 {{ $this->budgetColor() }}"
-                        value="{{ $this->BudgetPercentage }}"
+                        value="{{ $this->budgetPercentage() }}"
                         max="100"
                     />
                 </div>
@@ -413,7 +440,7 @@ new class extends Component
 
                                     <div>
                                         <p class="text-sm text-zinc-500">
-                                            ₱{{ number_format($budget->spent(),2) }}
+                                            ₱{{ number_format($budget->spent,2) }}
                                             /
                                             ₱{{ number_format($budget->amount_limit,2) }}
                                         </p>
@@ -737,10 +764,11 @@ new class extends Component
                         </flux:button>
 
                     </div>
-            </form>
+                </form>
+            </div>
         </div>
     @endif
-</div>
+
 
 @script
 <script>

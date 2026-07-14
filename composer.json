@@ -20,6 +20,7 @@
         "robsontenorio/mary": "^2.8"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^4.4",
         "fakerphp/faker": "^1.24",
         "laravel/pail": "^1.2.5",
         "laravel/pao": "^1.0.6",

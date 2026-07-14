@@ -258,6 +258,7 @@ new class extends Component
         </div>
     </div>
 
+
     {{-- Add Modal --}}
     @if ($showAddModal == true)
         <x-popup close="closeModals">
