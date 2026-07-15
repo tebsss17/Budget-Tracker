@@ -280,7 +280,21 @@ new class extends Component
                     </h2>
 
                     <div class="mt-2">
-                        @if ()
+                        @if ($this->savingsStat['saved'] >= 0)
+
+                            <div class="flex flex-row gap-1 items-center text-center">
+                                <x-lucide-trending-up class="size-4 text-emerald-600" />
+                                <p class="text-sm text-emerald-600 text-center">
+                                    {{ $this->savingsStat['savedPercent'] }}% of you income saved
+                                </p>
+                            </div>
+                        @else
+                            <div class="flex flex-row gap-1 items-center text-center">
+                                <x-lucide-trending-down class="size-4 text-rose-600" />
+                                <p class="text-sm text-rose-600">
+                                    {{ $this->savingsStat['savedPercent'] }}
+                                </p>
+                            </div>
 
                         @endif
                     </div>
