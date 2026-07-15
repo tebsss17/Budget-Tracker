@@ -28,15 +28,15 @@ class Budget extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function spent()
-    {
-        return Transaction::where('user_id', $this->user_id)
-                ->where('category_id', $this->category_id)
-                ->where('type', 'Expense')
-                ->whereMonth('transaction_date', $this->month)
-                ->whereYear('transaction_date', $this->year)
-                ->sum('amount');
-    }
+    // public function spent()
+    // {
+    //     return Transaction::where('user_id', $this->user_id)
+    //             ->where('category_id', $this->category_id)
+    //             ->where('type', 'Expense')
+    //             ->whereMonth('transaction_date', $this->month)
+    //             ->whereYear('transaction_date', $this->year)
+    //             ->sum('amount');
+    // }
 
     public function remaining()
     {

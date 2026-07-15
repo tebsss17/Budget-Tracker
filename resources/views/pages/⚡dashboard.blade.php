@@ -143,12 +143,26 @@ new class extends Component
             ->get();
     }
 
+    public function getsavingsStatProperty()
+    {
+        $income = $this->IncomeThisMonth;
+        $expense = $this->ExpenseThisMonth;
+
+        $saved = $income - $expense;
+        $savedPercent = $income >= 0 ? round(($saved / $income) * 100) : 0;
+
+        return [
+            'saved' => $saved,
+            'savedPercent' => $savedPercent,
+        ];
+    }
+
 };
 ?>
 
 <div class="space-y-6">
 
-    {{-- Fetching monthly net change --}}
+    {{-- Fetching methods --}}
     @php
         $netChange = Auth::user()->monthlyNetChange();
     @endphp
@@ -255,21 +269,21 @@ new class extends Component
             </div>
         </flux:card>
 
-        {{-- Budget Used --}}
+        {{-- Saved this month --}}
         <flux:card class="p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-zinc-500">Budget Used</p>
+                    <p class="text-sm text-zinc-500">Saved This Month</p>
 
                     <h2 class="mt-2 text-3xl font-bold">
-                        {{ round($this->BudgetPercentage) }}%
+                       ₱ {{ number_format($this->savingsStat['saved'], 2) }}
                     </h2>
 
-                    <x-mary-progress
-                        class="mt-2 h-4.5 {{ $this->budgetColor() }}"
-                        value="{{ $this->BudgetPercentage }}"
-                        max="100"
-                    />
+                    <div class="mt-2">
+                        @if ()
+
+                        @endif
+                    </div>
                 </div>
 
                 <div class="rounded-xl bg-blue-100 p-3 dark:bg-blue-900/30">
