@@ -8,7 +8,6 @@ new class extends Component
     // VARIRABLES
     public $step = 1;
     public $starting_balance = null;
-    public $chartRange = '30_days';
 
 
     public function mount()
@@ -81,7 +80,7 @@ new class extends Component
             ->sum('amount_limit');
     }
 
-    public function budgetPercentage()
+    public function getBudgetPercentageProperty()
     {
         if($this->MonthlyBudget == 0) {
             return 0;
@@ -94,15 +93,15 @@ new class extends Component
 
     public function budgetColor()
     {
-        if($this->budgetPercentage() <= 50){
+        if($this->BudgetPercentage <= 50){
             return 'progress-success';
         }
 
-        if($this->budgetPercentage() <= 75){
+        if($this->BudgetPercentage <= 75){
             return 'progress-info';
         }
 
-        if($this->budgetPercentage() <= 90 ){
+        if($this->BudgetPercentage <= 90 ){
             return 'progress-warning';
         }
 
@@ -134,25 +133,13 @@ new class extends Component
         return $budgets;
     }
 
-    public function getRecentTransaction()
+    public function getrecentTransactionProperty()
     {
         return $this->user()->transaction()
             ->with('category')
             ->latest('transaction_date')
-            ->take(10)
+            ->take(5)
             ->get();
-    }
-
-    public function monthlySpendingChart()
-    {
-        return match ($this->chartRange){
-            '30_days' => $this->lastThirtyDaysChart(),
-            '3_months' => $this->lastThreeMonthsChart(),
-            '6_months' => $this->lastSixMonthsChart(),
-            'this_year' => $this->thisYearChart(),
-            'all' => $this->allTimeChart(),
-            default => collect(),
-        };
     }
 
     private function expenseQuery()
@@ -169,90 +156,6 @@ new class extends Component
             data: $this->monthlySpendingChart()
         );
     }
-
-    private function lastThirtyDaysChart()
-    {
-        return $this->expenseQuery()
-            ->whereDate(
-                'transaction_date', '>=', now()->subDays(29)
-            )
-            ->selectRaw('
-                DATE(transaction_date) as label,
-                SUM(amount) as total
-            ')
-            ->groupBy('label')
-            ->orderBy('label')
-            ->get();
-    }
-
-    private function lastThreeMonthsChart()
-    {
-        return $this->expenseQuery()
-            ->whereDate(
-                'transaction_date', '>=', now()->subMonths(2)->startOfMonth()
-            )
-            ->selectRaw('
-                EXTRACT(YEAR FROM transaction_date) as year,
-                EXTRACT(MONTH FROM transaction_date) as month,
-                SUM(amount) as total
-            ')
-            ->groupBy('year', 'month')
-            ->orderBy('year')
-            ->orderBy('month')
-            ->get();
-    }
-
-    private function lastSixMonthsChart()
-    {
-        return $this->expenseQuery()
-            ->whereDate(
-                'transaction_date', '>=', now()->subMonths(5)->startOfMonth()
-            )
-            ->selectRaw('
-                EXTRACT(YEAR FROM transaction_date) as year,
-                EXTRACT(MONTH FROM transaction_date) as month,
-                SUM(amount) as total
-            ')
-            ->groupBy('year', 'month')
-            ->orderBy('year')
-            ->orderBy('month')
-            ->get();
-    }
-
-    private function thisYearChart()
-    {
-        return $this->expenseQuery()
-            ->whereYear(
-                'transaction_date', now()->year
-            )
-            ->selectRaw('
-                EXTRACT(MONTH FROM transaction_date) as month,
-                SUM(amount) as total
-            ')
-            ->groupBy('month')
-            ->orderBy('month')
-            ->get();
-    }
-
-    public function allTimeChart()
-    {
-        return $this->expenseQuery()
-            ->selectRaw('
-                EXTRACT(YEAR FROM transaction_date) as year,
-                SUM(amount) as total
-            ')
-            ->groupBy('year')
-            ->orderBy('year')
-            ->get();
-    }
-
-    public function fetchChartData($range)
-{
-    $this->chartRange = $range;
-
-    // Ibalik agad ang data bilang pure JSON response, walang UI renders!
-    return response()->json($this->monthlySpendingChart());
-}
 };
 ?>
 
@@ -372,12 +275,12 @@ new class extends Component
                     <p class="text-sm text-zinc-500">Budget Used</p>
 
                     <h2 class="mt-2 text-3xl font-bold">
-                        {{ round($this->budgetPercentage()) }}%
+                        {{ round($this->BudgetPercentage) }}%
                     </h2>
 
                     <x-mary-progress
                         class="mt-2 h-4.5 {{ $this->budgetColor() }}"
-                        value="{{ $this->budgetPercentage() }}"
+                        value="{{ $this->BudgetPercentage }}"
                         max="100"
                     />
                 </div>
@@ -504,38 +407,38 @@ new class extends Component
             </div>
 
             <div class="mt-6 space-y-6 max-h-[500px] overflow-y-auto">
-                @forelse ($this->getRecentTransaction() as $recentTransaction )
+                @forelse ($this->recentTransaction as $transaction )
                     <div class="flex items-center justify-between">
 
                         <div class="flex gap-3 items-center">
 
-                            <div class="rounded-xl p-2 {{ $recentTransaction->category->bg_color }}">
+                            <div class="rounded-xl p-2 {{ $transaction->category->bg_color }}">
                                 <x-dynamic-component
-                                    :component="'lucide-'.$recentTransaction->category->icon"
-                                    class="size-5 {{ $recentTransaction->category->text_color }}"
+                                    :component="'lucide-'.$transaction->category->icon"
+                                    class="size-5 {{ $transaction->category->text_color }}"
                                 />
                             </div>
 
                             <div>
-                                <p class="font-semibold capitalize">{{ $recentTransaction->category->name }}</p>
-                                <p class="text-sm text-zinc-500">{{ Str::limit($recentTransaction->description ?: 'No Description', 20) }}</p>
+                                <p class="font-semibold capitalize">{{ $transaction->category->name }}</p>
+                                <p class="text-sm text-zinc-500">{{ Str::limit($transaction->description ?: 'No Description', 20) }}</p>
                             </div>
                         </div>
 
                         <div class="text-right shrink-0">
-                            @if ($recentTransaction->type == 'Income')
+                            @if ($transaction->type == 'Income')
                                 <p class="font-semibold text-emerald-500">
-                                    +₱ {{ number_format($recentTransaction->amount, 2) }}
+                                    +₱ {{ number_format($transaction->amount, 2) }}
                                 </p>
                             @else
                                 <p class="font-semibold text-rose-500">
-                                    -₱ {{ number_format($recentTransaction->amount, 2) }}
+                                    -₱ {{ number_format($transaction->amount, 2) }}
                                 </p>
                             @endif
 
                             <div>
                                 <p class="text-sm text-zinc-500">
-                                    {{ date('F j, Y', strtotime($recentTransaction->transaction_date)) }}
+                                    {{ date('F j, Y', strtotime($transaction->transaction_date)) }}
                                 </p>
                             </div>
 
@@ -569,44 +472,6 @@ new class extends Component
         </flux:card>
     </div>
 
-    {{-- Monthy Spending Analytics --}}
-    <div class="mt-10">
-
-        <flux:card class="p-6">
-
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
-                <div>
-                    <flux:heading size="lg">
-                        Monthly Spending
-                    </flux:heading>
-
-                    <flux:text class="text-zinc-500">
-                        Track your spending trend over the past months.
-                    </flux:text>
-                </div>
-                {{-- Make this monthly for simplicity--}}
-                <flux:select class="w-full sm:w-44" wire:model='chartRange' wire:change='updateChartRange'>
-                    <flux:select.option value="all">All</flux:select.option>
-                    <flux:select.option value="30_days">30 Days</flux:select.option>
-                    <flux:select.option value="3_months">3 Months</flux:select.option>
-                    <flux:select.option value="6_months">6 Months</flux:select.option>
-                    <flux:select.option value="this_year">This Year</flux:select.option>
-
-                </flux:select>
-
-            </div>
-
-            <div class="mt-8 h-80 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 flex items-center justify-center">
-                <canvas
-                    id="monthlySpendingChart"
-                    wire:ignore
-                ></canvas>
-            </div>
-
-        </flux:card>
-
-    </div>
 
 
     {{-- Starting Balance Modal --}}
@@ -769,74 +634,3 @@ new class extends Component
         </div>
     @endif
 
-
-@script
-<script>
-        let spendingChart;
-
-// Helper function para gawing pangalan ng buwan ang buwan na numero (e.g., 1 -> Jan)
-const getMonthName = (monthNum) => {
-    if (!monthNum) return '';
-    const date = new Date();
-    date.setMonth(monthNum - 1);
-    return date.toLocaleString('default', { month: 'short' });
-};
-
-const renderChart = (data) => {
-    const ctx = document.getElementById('monthlySpendingChart');
-    if (!ctx) return;
-
-    // Gumawa ng labels base sa kung anong data structure ang bumalik
-    const labels = data.map(item => {
-        if (item.label) return item.label; // Para sa 30 Days query
-        if (item.month && item.year) return `${getMonthName(item.month)} ${item.year}`; // Para sa 3/6 Months
-        if (item.month) return getMonthName(item.month); // Para sa This Year
-        if (item.year) return item.year; // Para sa All Time
-        return '';
-    });
-
-    const chartData = data.map(item => item.total);
-
-    if (!spendingChart) {
-        spendingChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Monthly Spending',
-                        data: chartData,
-                        borderWidth: 3,
-                        tension: .4,
-                        fill: true,
-                        borderColor: '#10b981', // Emerald-500 para bumagay sa theme mo
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    } else {
-        spendingChart.data.labels = labels;
-        spendingChart.data.datasets[0].data = chartData;
-        spendingChart.update();
-    }
-};
-
-// I-render ang default chart sa unang load
-renderChart(@js($this->monthlySpendingChart()));
-
-// Makinig sa update-chart event mula sa Livewire
-Livewire.on('update-chart', ({ data }) => {
-    renderChart(data);
-});
-    </script>
-@endscript

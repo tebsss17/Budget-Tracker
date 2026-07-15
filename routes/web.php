@@ -11,6 +11,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::livewire('/budget', 'pages::budget.index')->name('budgets');
 
+    Route::livewire('/analytics', 'pages::analytics')->name('analytics');
+
 });
 
 require __DIR__.'/settings.php';

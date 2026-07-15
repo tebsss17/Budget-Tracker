@@ -24,6 +24,10 @@
                         <flux:sidebar.item icon="banknotes" :href="route('budgets')" :current="request()->routeIs('budgets')" wire:navigate>
                             Budget
                         </flux:sidebar.item>
+
+                        <flux:sidebar.item icon="chart-bar-square" :href="route('analytics')" :current="request()->routeIs('analytics')" wire:navigate>
+                            Analytics
+                        </flux:sidebar.item>
                     </div>
                 </flux:sidebar.group>
 

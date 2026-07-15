@@ -22,6 +22,17 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->date('transaction_date');
             $table->timestamps();
+
+            $table->index([
+                'user_id',
+                'type',
+                'transaction_date'
+            ]);
+
+            $table->index([
+                'user_id',
+                'category_id'
+            ]);
         });
     }
 
