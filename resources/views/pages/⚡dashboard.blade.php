@@ -50,10 +50,11 @@ new class extends Component
 
 
     // QUERY FUNCTIONS
-    public function user()
+    private function user()
     {
         return auth()->user();
     }
+
     public function getIncomeThisMonthProperty()
     {
         return $this->user()->transaction()
@@ -138,24 +139,10 @@ new class extends Component
         return $this->user()->transaction()
             ->with('category')
             ->latest('transaction_date')
-            ->take(5)
+            ->take(10)
             ->get();
     }
 
-    private function expenseQuery()
-    {
-        return $this->user()->transaction()
-            ->where('type', 'Expense');
-    }
-
-    public function updateChartRange()
-    {
-        $this->dispatch(
-            'update-chart',
-
-            data: $this->monthlySpendingChart()
-        );
-    }
 };
 ?>
 
