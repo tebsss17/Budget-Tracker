@@ -138,7 +138,7 @@ new class extends Component
     {
         return $this->user()->transaction()
             ->with('category')
-            ->latest('transaction_date')
+            ->latest('updated_at')
             ->take(10)
             ->get();
     }
