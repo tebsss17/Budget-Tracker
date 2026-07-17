@@ -280,22 +280,27 @@ new class extends Component
                     </h2>
 
                     <div class="mt-2">
-                        @if ($this->savingsStat['saved'] >= 0)
-
-                            <div class="flex flex-row gap-1 items-center text-center">
+                       @if ($this->savingsStat['saved'] >= 0)
+                            <div class="flex items-center gap-1">
                                 <x-lucide-trending-up class="size-4 text-emerald-600" />
-                                <p class="text-sm text-emerald-600 text-center">
-                                    {{ $this->savingsStat['savedPercent'] }}% of you income saved
+                                <p class="text-sm text-emerald-600">
+                                    {{ $this->savingsStat['savedPercent'] }}% of your income saved
+                                </p>
+                            </div>
+                        @elseif ($this->IncomeThisMonth > 0)
+                            <div class="flex items-center gap-1">
+                                <x-lucide-trending-down class="size-4 text-rose-600" />
+                                <p class="text-sm text-rose-600">
+                                    {{ round((abs($this->savingsStat['saved']) / $this->IncomeThisMonth) * 100) }}% overspent this month
                                 </p>
                             </div>
                         @else
-                            <div class="flex flex-row gap-1 items-center text-center">
-                                <x-lucide-trending-down class="size-4 text-rose-600" />
-                                <p class="text-sm text-rose-600">
-                                    {{ $this->savingsStat['savedPercent'] }}
+                            <div class="flex items-center gap-1">
+                                <x-lucide-trending-down class="size-4 text-zinc-500" />
+                                <p class="text-sm text-zinc-500">
+                                    No income recorded this month
                                 </p>
                             </div>
-
                         @endif
                     </div>
                 </div>
