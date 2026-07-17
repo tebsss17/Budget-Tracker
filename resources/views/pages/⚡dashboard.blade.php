@@ -298,7 +298,7 @@ new class extends Component
                             <div class="flex items-center gap-1">
                                 <x-lucide-trending-down class="size-4 text-zinc-500" />
                                 <p class="text-sm text-zinc-500">
-                                    No income recorded this month
+                                    No savings recorded this month
                                 </p>
                             </div>
                         @endif
@@ -353,7 +353,7 @@ new class extends Component
 
                                         {{-- Condtional over budget --}}
                                         @if ($budget->isOverBudget())
-                                            <div class="    flex items-center rounded-lg bg-rose-100 dark:bg-rose-900/40 px-2 py-0.5 text-xs font-semibold text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50 animate-pulse">
+                                            <div class="flex items-center rounded-lg bg-rose-100 dark:bg-rose-900/40 px-2 py-0.5 text-xs font-semibold text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50 animate-pulse">
                                                 <x-lucide-triangle-alert class="size-4 shrink-0 mr-1" />
                                                 Over Budget
                                             </div>
