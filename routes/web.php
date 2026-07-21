@@ -9,6 +9,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::livewire('/transactions', 'pages::transactions.index')->name('transactions');
 
+    Route::livewire('/accounts', 'pages::accounts.index')->name('accounts');
+
+    Route::livewire('/categories', 'pages::categories.index')->name('categories');
+
     Route::livewire('/budget', 'pages::budget.index')->name('budgets');
 
     Route::livewire('/goals', 'pages::goals')->name('goals');

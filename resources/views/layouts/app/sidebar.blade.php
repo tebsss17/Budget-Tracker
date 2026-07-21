@@ -17,8 +17,16 @@
                             Dashboard
                         </flux:sidebar.item>
 
-                        <flux:sidebar.item icon="credit-card" :href="route('transactions')" :current="request()->routeIs('transactions')" wire:navigate>
+                        <flux:sidebar.item icon="arrows-right-left" :href="route('transactions')" :current="request()->routeIs('transactions')" wire:navigate>
                             Transactions
+                        </flux:sidebar.item>
+
+                        <flux:sidebar.item icon="credit-card" :href="route('accounts')" :current="request()->routeIs('accounts')" wire:navigate>
+                            Accounts
+                        </flux:sidebar.item>
+
+                        <flux:sidebar.item icon="rectangle-stack" :href="route('categories')" :current="request()->routeIs('categories')" wire:navigate>
+                            Categories
                         </flux:sidebar.item>
 
                         <flux:sidebar.item icon="banknotes" :href="route('budgets')" :current="request()->routeIs('budgets')" wire:navigate>
