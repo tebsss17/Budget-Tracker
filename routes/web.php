@@ -11,6 +11,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::livewire('/budget', 'pages::budget.index')->name('budgets');
 
+    Route::livewire('/goals', 'pages::goals')->name('goals');
+
     Route::livewire('/analytics', 'pages::analytics')->name('analytics');
 
 });

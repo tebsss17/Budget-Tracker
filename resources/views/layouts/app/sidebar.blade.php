@@ -25,6 +25,10 @@
                             Budget
                         </flux:sidebar.item>
 
+                        <flux:sidebar.item icon="rocket-launch" :href="route('goals')" :current="request()->routeIs('goals')" wire:navigate>
+                            Goals
+                        </flux:sidebar.item>
+
                         <flux:sidebar.item icon="chart-bar-square" :href="route('analytics')" :current="request()->routeIs('analytics')" wire:navigate>
                             Analytics
                         </flux:sidebar.item>

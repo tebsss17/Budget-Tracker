@@ -305,8 +305,8 @@ new class extends Component
                     </div>
                 </div>
 
-                <div class="rounded-xl bg-blue-100 p-3 dark:bg-blue-900/30">
-                    <x-lucide-target class="h-6 w-6 text-blue-600" />
+                <div class="rounded-xl bg-amber-100 p-3 dark:bg-amber-900/30">
+                    <x-lucide-piggy-bank class="h-6 w-6 text-amber-600" />
                 </div>
             </div>
         </flux:card>
