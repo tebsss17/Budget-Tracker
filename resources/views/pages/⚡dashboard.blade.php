@@ -149,7 +149,7 @@ new class extends Component
         $expense = $this->ExpenseThisMonth;
 
         $saved = $income - $expense;
-        $savedPercent = $income >= 0 ? round(($saved / $income) * 100) : 0;
+        $savedPercent = $income > 0 ? round(($saved / $income) * 100) : 0;
 
         return [
             'saved' => $saved,
@@ -338,10 +338,10 @@ new class extends Component
 
                             <div class="flex items-center gap-3">
 
-                                <div class="rounded-xl p-2 {{ $budget->category->bg_color }}">
+                                <div class="rounded-xl p-2 {{ $budget->category->bg_color() }}">
                                     <x-dynamic-component
                                         :component="'lucide-'.$budget->category->icon"
-                                        class="size-5 {{ $budget->category->text_color }}"
+                                        class="size-5 {{ $budget->category->text_color() }}"
                                     />
                                 </div>
 

@@ -13,159 +13,153 @@ class CategorySeeder extends Seeder
             // Expense
             [
                 'name' => 'Food',
+                'user_id' => null,
                 'type' => 'Expense',
                 'icon' => 'utensils-crossed',
-                'bg_color' => 'bg-orange-100 dark:bg-orange-900/30',
-                'text_color' => 'text-orange-600'
+                'color' => 'orange'
             ],
             [
                 'name' => 'Transportation',
+                'user_id' => null,
                 'type' => 'Expense',
                 'icon' => 'car',
-                'bg_color' => 'bg-blue-100 dark:bg-blue-900/30',
-                'text_color' => 'text-blue-600'
-            ],
-            [
-                'name' => 'Shopping',
-                'type' => 'Expense',
-                'icon' => 'shopping-cart',
-                'bg_color' => 'bg-pink-100 dark:bg-pink-900/30',
-                'text_color' => 'text-pink-600'
+                'color' => 'blue'
             ],
             [
                 'name' => 'Bills',
+                'user_id' => null,
                 'type' => 'Expense',
                 'icon' => 'receipt-text',
-                'bg_color' => 'bg-red-100 dark:bg-red-900/30',
-                'text_color' => 'text-red-600'
+                'color' => 'red'
+            ],
+            [
+                'name' => 'Shopping',
+                'user_id' => null,
+                'type' => 'Expense',
+                'icon' => 'shopping-cart',
+                'color' => 'pink'
             ],
             [
                 'name' => 'Rent',
+                'user_id' => null,
                 'type' => 'Expense',
                 'icon' => 'house',
-                'bg_color' => 'bg-amber-100 dark:bg-amber-900/30',
-                'text_color' => 'text-amber-600'
+                'color' => 'amber'
             ],
             [
                 'name' => 'Utilities',
+                'user_id' => null,
                 'type' => 'Expense',
                 'icon' => 'lightbulb',
-                'bg_color' => 'bg-yellow-100 dark:bg-yellow-900/30',
-                'text_color' => 'text-yellow-600'
+                'color' => 'yellow'
             ],
             [
                 'name' => 'Health',
+                'user_id' => null,
                 'type' => 'Expense',
                 'icon' => 'heart-pulse',
-                'bg_color' => 'bg-emerald-100 dark:bg-emerald-900/30',
-                'text_color' => 'text-emerald-600'
-            ],
-            [
-                'name' => 'Medicine',
-                'type' => 'Expense',
-                'icon' => 'pill',
-                'bg_color' => 'bg-lime-100 dark:bg-lime-900/30',
-                'text_color' => 'text-lime-600'
+                'color' => 'emerald'
             ],
             [
                 'name' => 'Education',
+                'user_id' => null,
                 'type' => 'Expense',
                 'icon' => 'school',
-                'bg_color' => 'bg-indigo-100 dark:bg-indigo-900/30',
-                'text_color' => 'text-indigo-600'
+                'color' => 'indigo'
             ],
             [
                 'name' => 'Entertainment',
+                'user_id' => null,
                 'type' => 'Expense',
                 'icon' => 'clapperboard',
-                'bg_color' => 'bg-purple-100 dark:bg-purple-900/30',
-                'text_color' => 'text-purple-600'
+                'color' => 'purple'
             ],
             [
                 'name' => 'Travel',
+                'user_id' => null,
                 'type' => 'Expense',
                 'icon' => 'plane',
-                'bg_color' => 'bg-sky-100 dark:bg-sky-900/30',
-                'text_color' => 'text-sky-600'
+                'color' => 'sky'
             ],
             [
                 'name' => 'Fuel',
+                'user_id' => null,
                 'type' => 'Expense',
                 'icon' => 'fuel',
-                'bg_color' => 'bg-slate-100 dark:bg-slate-900/30',
-                'text_color' => 'text-slate-600'
+                'color' => 'slate'
+            ],
+             [
+                'name' => 'Clothing',
+                'user_id' => null,
+                'type' => 'Expense',
+                'icon' => 'shirt',
+                'color' => 'rose'
             ],
             [
                 'name' => 'Pets',
+                'user_id' => null,
                 'type' => 'Expense',
                 'icon' => 'paw-print',
-                'bg_color' => 'bg-teal-100 dark:bg-teal-900/30',
-                'text_color' => 'text-teal-600'
+                'color' => 'teal'
             ],
             [
                 'name' => 'Insurance',
+                'user_id' => null,
                 'type' => 'Expense',
                 'icon' => 'shield-check',
-                'bg_color' => 'bg-cyan-100 dark:bg-cyan-900/30',
-                'text_color' => 'text-cyan-600'
+                'color' => 'cyan'
             ],
             [
-                'name' => 'Clothing',
+                'name' => 'Medicine',
+                'user_id' => null,
                 'type' => 'Expense',
-                'icon' => 'shirt',
-                'bg_color' => 'bg-rose-100 dark:bg-rose-900/30',
-                'text_color' => 'text-rose-600'
+                'icon' => 'pill',
+                'color' => 'lime'
             ],
             [
-                'name' => 'Miscellaneous',
+                'name' => 'Others',
+                'user_id' => null,
                 'type' => 'Expense',
                 'icon' => 'circle-question-mark',
-                'bg_color' => 'bg-gray-100 dark:bg-gray-900/30',
-                'text_color' => 'text-gray-600'
+                'color' => 'gray'
             ],
-            [
-                'name' => 'Savings',
-                'type' => 'Expense',
-                'icon' => 'piggy-bank',
-                'bg_color' => 'bg-emerald-100 dark:bg-emerald-900/30',
-                'text_color' => 'text-emerald-600'
-            ],
+
 
             // Income
             [
                 'name' => 'Salary',
+                'user_id' => null,
                 'type' => 'Income',
                 'icon' => 'banknote-check',
-                'bg_color' => 'bg-green-100 dark:bg-green-900/30',
-                'text_color' => 'text-green-600'
+                'color' => 'green'
+            ],
+             [
+                'name' => 'Business',
+                'user_id' => null,
+                'type' => 'Income',
+                'icon' => 'store',
+                'color' => 'orange'
             ],
             [
                 'name' => 'Freelance',
+                'user_id' => null,
                 'type' => 'Income',
                 'icon' => 'briefcase-business',
-                'bg_color' => 'bg-violet-100 dark:bg-violet-900/30',
-                'text_color' => 'text-violet-600'
+                'color' => 'violet'
             ],
             [
-                'name' => 'Business',
-                'type' => 'Income',
-                'icon' => 'store',
-                'bg_color' => 'bg-orange-100 dark:bg-orange-900/30',
-                'text_color' => 'text-orange-600'
-            ],
-            [
-                'name' => 'Investments',
+                'name' => 'Investment',
+                'user_id' => null,
                 'type' => 'Income',
                 'icon' => 'chart-spline',
-                'bg_color' => 'bg-blue-100 dark:bg-amber-blue/30',
-                'text_color' => 'text-blue-600'
+                'color' => 'blue'
             ],
             [
                 'name' => 'Other Income',
+                'user_id' => null,
                 'type' => 'Income',
                 'icon' => 'wallet-cards',
-                'bg_color' => 'bg-zinc-100 dark:bg-zinc-900/30',
-                'text_color' => 'text-zinc-600'
+                'color' => 'zinc'
             ],
 
         ]);

@@ -47,7 +47,9 @@ new class extends Component
 
     public function categories()
     {
-        return Category::orderBy('name')->get();
+        return Category::orderBy('name')
+            ->where('type', 'Expense')
+            ->get();
     }
 
     public function years()
