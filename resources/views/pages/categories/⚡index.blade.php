@@ -1,6 +1,7 @@
 <?php
 
 use Livewire\Component;
+use App\Models\Category;
 
 new class extends Component
 {
@@ -14,16 +15,38 @@ new class extends Component
     public $icon = '';
     public $color = '';
 
-    public $category_id = null;
+    public $selectedCategory = null;
 
     public $filteredCategory = '';
+    public $filteredType = '';
 
 
 
     // QUERY FUNCTIONS
     public function categories()
     {
+        return Category::query()
+            ->where(function($query) {
+                $query->where('is_default', true)
+                    ->orWhere('user_id', auth()->id());
+            })
 
+            ->when($this->filteredCategory === 'default', function ($query) {
+                $query->where('is_default', true);
+            })
+
+            ->when($this->filteredCategory === 'custom', function ($query) {
+                $query->where('user_id', auth()->id())
+                      ->where('is_default', false);
+            })
+
+            ->when($this->filteredType, function($query)  {
+                $query->where('type', $this->filteredType);
+            })
+
+            ->orderBy('type')
+            ->orderBy('name')
+            ->paginate(10);
     }
 
 
@@ -53,13 +76,66 @@ new class extends Component
         $this->resetForm();
     }
 
+    public function loadCategories($id)
+    {
+        $this->selectedCategory = Auth::user()
+            ->category()
+            ->findOrFail($id);
+
+        $this->name  = $this->selectedCategory->name;
+        $this->type  = $this->selectedCategory->type;
+        $this->icon  = $this->selectedCategory->icon;
+        $this->color  = $this->selectedCategory->color;
+    }
+
+    public function addModal()
+    {
+        $this->showAddModal = true;
+    }
+
+    public function editModal($id)
+    {
+        $this->loadCategories($id);
+        $this->showEditModal = true;
+
+    }
+
+    public function deleteModal($id)
+    {
+        $this->loadCategories($id);
+        $this->showDeleteModal = true;
+    }
 
 
     // CRUD LOGIC
+    public function addCategory()
+    {
+
+    }
+
+    public function editCategory()
+    {
+
+    }
+
+    public function deleteCategory()
+    {
+
+    }
+
+    protected function rules()
+    {
+
+    }
+
+    protected function messages()
+    {
+
+    }
 };
 ?>
 
-<div>
+<div class="space-y-6">
     {{-- Breadcrumbs --}}
     <flux:breadcrumbs>
         <flux:breadcrumbs.item href="{{ route('dashboard') }}">
@@ -75,11 +151,11 @@ new class extends Component
     <div class="flex flex-col md:flex-row justify-between space-y-4 border-b">
         <div>
             <flux:heading size="xl">
-                Categoriesd
+                Categories
             </flux:heading>
 
             <flux:text>
-                Create your custom categories
+                Manage your default and custom categories for organizing your transactions
             </flux:text>
         </div>
 
@@ -88,7 +164,7 @@ new class extends Component
             icon="plus-circle"
             wire:loading.attr='disabled'
         >
-            Create Transaction
+            Create Category
         </flux:button>
     </div>
 
@@ -102,4 +178,64 @@ new class extends Component
             </flux:select>
         </div>
     </div>
+
+    @if ($showAddModal == true)
+        <x-popup close="closeModals">
+            <form wire:submit='addCategory' class="space-y-6">
+                <div class="flex flex-row justify-between items-center">
+                    <flux:heading size="xl">
+                        Create Custom Category
+                    </flux:heading>
+
+                    <flux:button wire:click='closeModals'>
+                        X
+                    </flux:button>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <flux:text class="mb-2">Type of Category</flux:text>
+                        <flux:select wire:model='type' placeholder="Select Type of Category..." required>
+                            <flux:select.option>Income</flux:select.option>
+                            <flux:select.option>Expense</flux:select.option>
+                        </flux:select>
+                        @error('type')
+                            <flux:text color="red">{{ $message }}</flux:text>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <flux:text class="mb-2">Name</flux:text>
+                        <flux:input
+                            placeholder="Name of Category"
+                            wire:model='name'
+                            required
+                            type="text"
+                        />
+                        @error('name')
+                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex justify-end gap-2">
+                        <flux:button
+                            wire:click='closeModals'
+                        >
+                            Cancel
+                        </flux:button>
+
+                        <flux:button
+                            type="submit"
+                            icon="plus-circle"
+                        >
+                            Create Category
+                        </flux:button>
+                    </div>
+
+                </div>
+            </form>
+    </x-popup>
+@endif
+
 </div>
+
