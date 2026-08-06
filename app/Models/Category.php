@@ -11,14 +11,17 @@ class Category extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'name',
         'type',
         'icon',
+        'color',
+        'is_default',
     ];
 
     public function user()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function transaction()
@@ -31,7 +34,7 @@ class Category extends Model
         return $this->hasMany(Budget::class);
     }
 
-    public function bg_color()
+    public function bgColor()
     {
         return match ($this->color) {
             'red' => 'bg-red-100 dark:bg-red-900/30',
@@ -54,7 +57,7 @@ class Category extends Model
 
     }
 
-    public function text_color()
+    public function textColor()
     {
         return match ($this->color) {
             'red' => 'text-red-600',
