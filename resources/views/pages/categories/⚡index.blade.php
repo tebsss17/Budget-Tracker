@@ -192,12 +192,33 @@ new class extends Component
 
     public function editCategory()
     {
+        $validated =  $this->validate();
 
+        $validated['name'] = strtolower(trim($validated['name']));
+        $validated['is_default'] = false;
+
+        $exists = auth()->user()->category()->where('name', $validated['name'])->exists();
+
+        if($exists)
+        {
+            $this->addError('name', 'Category already exists.');
+            return;
+        }
+
+        Auth::user()->category()->create($validated);
+
+        Flux::toast(variant: 'success', text: 'Category Updated Successfully!');
+
+        $this->closeModals();
     }
 
     public function deleteCategory()
     {
+        $this->selectedCategory->delete();
 
+        Flux::toast(variant: 'success', text: 'Category Deleted Successfully!');
+
+        $this->closeModals();
     }
 
     protected function rules()
@@ -287,7 +308,7 @@ new class extends Component
                     <p>{{ $category->type }}</p>
 
                     @if ($category->is_default)
-                        <x-mary-badge class="bg-gradient">
+                        <x-mary-badge class="bg-emerald-300">
                             Default
                         </x-mary-badge>
                     @else
