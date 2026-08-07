@@ -432,10 +432,10 @@ new class extends Component
 
                         <div class="flex gap-3 items-center">
 
-                            <div class="rounded-xl p-2 {{ $transaction->category->bgColor }}">
+                            <div class="rounded-xl p-2 {{ $transaction->category->bgColor() }}">
                                 <x-dynamic-component
                                     :component="'lucide-'.$transaction->category->icon"
-                                    class="size-5 {{ $transaction->category->textColor }}"
+                                    class="size-5 {{ $transaction->category->textColor() }}"
                                 />
                             </div>
 

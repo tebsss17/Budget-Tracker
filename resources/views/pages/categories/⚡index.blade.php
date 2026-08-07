@@ -285,6 +285,17 @@ new class extends Component
             @forelse ($this->categories() as $category )
                 <flux:card wire:key='category-{{ $category->id }}'>
                     <p>{{ $category->type }}</p>
+
+                    @if ($category->is_default)
+                        <x-mary-badge class="bg-gradient">
+                            Default
+                        </x-mary-badge>
+                    @else
+                        <x-mary-badge>
+                            Custom
+                        </x-mary-badge>
+
+                    @endif
                     <p class="capitalize">{{ $category->name }}</p>
                     <x-dynamic-component :component="'lucide-'.$category->icon" class="h-5 w-5"/>
                     <p>{{ $category->icon }}</p>
@@ -471,7 +482,7 @@ new class extends Component
             <form wire:submit='editCategory' class="space-y-6">
                 <div class="flex flex-row justify-between items-center">
                     <flux:heading size="xl">
-                        Edit Category : {{ $selectedCategory->id }}
+                        Edit Category {{ $selectedCategory->id }}
                     </flux:heading>
 
                     <flux:button wire:click='closeModals'>
@@ -479,18 +490,41 @@ new class extends Component
                     </flux:button>
                 </div>
 
+                {{-- Category Type --}}
                 <div class="space-y-6">
                     <div>
-                        <flux:text class="mb-2">Type of Category</flux:text>
-                        <flux:select wire:model='type' placeholder="Select Type of Category..." required>
-                            <flux:select.option>Income</flux:select.option>
-                            <flux:select.option>Expense</flux:select.option>
-                        </flux:select>
-                        @error('type')
-                            <flux:text color="red">{{ $message }}</flux:text>
-                        @enderror
+                        <div class="flex gap-2">
+                            <button
+                                type="button"
+                                wire:click="$set('type', 'Income')"
+                                class="flex-1 rounded-lg border px-4 py-2 text-sm font-black uppercase transition-all duration-300 ease-in-out
+                                {{ $type === 'Income'
+                                    ? 'border-emerald-500 bg-emerald-50 text-emerald-600 shadow-sm'
+                                    : 'border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50' }}"
+                            >
+                                Income
+                            </button>
+
+                            <button
+                                type="button"
+                                wire:click="$set('type', 'Expense')"
+                                class="flex-1 rounded-lg border px-4 py-2 text-sm font-black uppercase transition-all duration-300 ease-in-out
+                                {{ $type === 'Expense'
+                                    ? 'border-rose-500 bg-rose-50 text-rose-600 shadow-sm'
+                                    : 'border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50' }}"
+                            >
+                                Expense
+                            </button>
+                        </div>
+
+                        <div>
+                            @error('type')
+                                <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
 
+                    {{-- Name --}}
                     <div>
                         <flux:text class="mb-2">Name</flux:text>
                         <flux:input
@@ -499,7 +533,79 @@ new class extends Component
                             required
                             type="text"
                         />
-                        @error('name')
+                        <div>
+                            @error('name')
+                                <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- Icon --}}
+                    <div>
+                        <flux:text class="mb-2">Choose an Icon</flux:text>
+
+                        <div class="max-h-50 overflow-y-auto rounded-lg border p-2">
+                            <div class="grid grid-cols-6 lg:grid-cols-8 gap-2">
+                                @foreach ($icons as $item )
+                                    <button
+                                        type="button"
+                                        wire:click="toggleIcon('{{ $item }}')"
+                                        class="flex aspect-square items-center justify-center rounded-lg border transition-all duration-300 {{ $icon ===  $item
+                                            ? 'border-blue-500 bg-blue-100 text-blue-600 shadow-sm'
+                                            : 'border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 scale-105'  }}"
+                                    >
+                                            <x-dynamic-component :component="'lucide-'.$item"
+                                                class="size-4"
+                                            />
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                        @error('icon')
+                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Color --}}
+                    <div>
+                        <flux:text class="mb-2">Choose a Color</flux:text>
+
+                        <div class="max-h-50 overflow-y-auto rounded-lg border p-2">
+                            <div class="grid grid-cols-6 lg:grid-cols-8 gap-2">
+                                @foreach ($colors as $item )
+                                    <button
+                                        type="button"
+                                        wire:click="toggleColor('{{ $item }}')"
+                                        class="size-8 rounded-full border-2 transition-all duration-300
+                                                {{ $color === $item ? 'ring-2 ring-offset-2 ring-zinc-400 scale-110' : 'hover:scale-105'}}"
+                                    >
+                                        <div
+                                            class="size-full rounded-full
+                                                {{ match($item) {
+                                                    'red' => 'bg-red-600',
+                                                    'orange' => 'bg-orange-600',
+                                                    'amber' => 'bg-amber-600',
+                                                     'yellow' => 'bg-yellow-600',
+                                                    'lime' => 'bg-lime-600',
+                                                    'green' => 'bg-green-600',
+                                                    'emerald' => 'bg-emerald-600',
+                                                    'teal' => 'bg-teal-600',
+                                                    'cyan' => 'bg-cyan-600',
+                                                    'sky' => 'bg-sky-600',
+                                                    'blue' => 'bg-blue-600',
+                                                    'indigo' => 'bg-indigo-600',
+                                                    'violet' => 'bg-violet-600',
+                                                    'purple' => 'bg-purple-600',
+                                                    'pink' => 'bg-pink-600',
+                                                    default => 'bg-zinc-600',
+                                                } }}"
+                                        >
+                                        </div>
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                        @error('color')
                             <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
@@ -514,8 +620,9 @@ new class extends Component
                         <flux:button
                             type="submit"
                             icon="plus-circle"
+                            wire:loading.attr='disabled'
                         >
-                            Create Category
+                            Save Changes
                         </flux:button>
                     </div>
 
@@ -527,10 +634,10 @@ new class extends Component
     {{-- Delete modal --}}
     @if ($showDeleteModal)
         <x-popup close="closeModals">
-            <form wire:submit='deleteModal' class="space-y-6">
-                <div class="flex flex-row justify-between items-center">
+            <form wire:submit='deleteCategory' class="space-y-6">
+            <div class="flex flex-row justify-between items-center">
                     <flux:heading size="xl">
-                        Edit Category : {{ $selectedCategory->id }}
+                        Delete {{ $selectedCategory->name }} budget
                     </flux:heading>
 
                     <flux:button wire:click='closeModals'>
@@ -538,31 +645,13 @@ new class extends Component
                     </flux:button>
                 </div>
 
+                <div>
+                    <flux:text>
+                        Are you sure you want to delete this budget?
+                    </flux:text>
+                </div>
+
                 <div class="space-y-6">
-                    <div>
-                        <flux:text class="mb-2">Type of Category</flux:text>
-                        <flux:select wire:model='type' placeholder="Select Type of Category..." required>
-                            <flux:select.option>Income</flux:select.option>
-                            <flux:select.option>Expense</flux:select.option>
-                        </flux:select>
-                        @error('type')
-                            <flux:text color="red">{{ $message }}</flux:text>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <flux:text class="mb-2">Name</flux:text>
-                        <flux:input
-                            placeholder="Name of Category"
-                            wire:model='name'
-                            required
-                            type="text"
-                        />
-                        @error('name')
-                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
                     <div class="flex justify-end gap-2">
                         <flux:button
                             wire:click='closeModals'
@@ -572,12 +661,11 @@ new class extends Component
 
                         <flux:button
                             type="submit"
-                            icon="plus-circle"
+                            wire:loading.attr='disabled'
                         >
-                            Create Category
+                            Delete Category
                         </flux:button>
                     </div>
-
                 </div>
             </form>
         </x-popup>
