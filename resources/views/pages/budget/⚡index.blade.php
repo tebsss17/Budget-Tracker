@@ -221,7 +221,7 @@ new class extends Component
             'month' => $month,
         ]);
 
-        Flux::toast(variant: 'success', text: 'Budget Edited Successfully!');
+        Flux::toast(variant: 'success', text: 'Budget Updated Successfully!');
 
         $this->closeModals();
     }

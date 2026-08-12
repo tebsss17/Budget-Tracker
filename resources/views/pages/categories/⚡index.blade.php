@@ -195,7 +195,6 @@ new class extends Component
         $validated =  $this->validate();
 
         $validated['name'] = strtolower(trim($validated['name']));
-        $validated['is_default'] = false;
 
         $exists = auth()->user()->category()->where('name', $validated['name'])->exists();
 
@@ -205,7 +204,7 @@ new class extends Component
             return;
         }
 
-        Auth::user()->category()->create($validated);
+        $this->selectedCategory->update($validated);
 
         Flux::toast(variant: 'success', text: 'Category Updated Successfully!');
 
@@ -214,7 +213,15 @@ new class extends Component
 
     public function deleteCategory()
     {
-        $this->selectedCategory->delete();
+        $category = $this->selectedCategory;
+
+        if ($category->transaction()->exists()){
+            Flux::toast(variant: 'danger', text: 'This category cannot be deleted because it has logs');
+            $this->closeModals();
+            return;
+        }
+
+        $category->delete();
 
         Flux::toast(variant: 'success', text: 'Category Deleted Successfully!');
 
