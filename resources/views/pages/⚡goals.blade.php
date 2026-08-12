@@ -22,6 +22,40 @@ new class extends Component
     public $fliterStatus = '';
     public $filterYear = '';
 
+    public $icons = [
+        'smartphone',
+        'laptop',
+        'house',
+        'plane',
+        'car',
+        'motorbike',
+        'camera',
+        'heart-pulse',
+        'gem',
+        'gift',
+        'briefcase-business',
+        'target',
+    ];
+
+    public $colors = [
+        'red',
+        'orange',
+        'amber',
+        'yellow',
+        'lime',
+        'green',
+        'emerald',
+        'teal',
+        'cyan',
+        'sky',
+        'blue',
+        'indigo',
+        'violet',
+        'purple',
+        'pink',
+        'zinc'
+    ];
+
 
     // QUERY FUNCTIONS
     public function goals()
@@ -77,7 +111,7 @@ new class extends Component
         $this->resetValidation();
     }
 
-    public function loadGoals($id)
+    public function loadGoal($id)
     {
         $this->selectedGoal = Auth::user()
             ->goal()
@@ -99,20 +133,30 @@ new class extends Component
 
     public function updateModal($id)
     {
-        $this->loadGoals($id);
+        $this->loadGoal($id);
 
         $this->showEditModal = true;
     }
 
     public function deleteModal($id)
     {
-        $this->loadGoals($id);
+        $this->loadGoal($id);
 
         $this->showDeleteModal = true;
     }
 
 
     // CRUD FUNCTIONS
+
+    public function toggleIcon($icon)
+    {
+        $this->icon = $this->icon === $icon ? '' : $icon;
+    }
+
+    public function toggleColor($color)
+    {
+        $this->color = $this->color === $color ? '' : $color;
+    }
 };
 ?>
 
@@ -123,7 +167,7 @@ new class extends Component
             Home
         </flux:breadcrumbs.item>
 
-        <flux:breadcrumbs.item href="{{ route('dashboard') }}">
+        <flux:breadcrumbs.item>
             Goals
         </flux:breadcrumbs.item>
     </flux:breadcrumbs>
@@ -141,7 +185,7 @@ new class extends Component
         </div>
 
         <flux:button
-            wire:click='setGoal'
+            wire:click='addModal'
             icon="plus-circle"
             wire:loading.attr='disabled'
         >
@@ -170,8 +214,140 @@ new class extends Component
 
     {{-- Add Modal --}}
     @if ($showAddModal === true)
-        <x-popup>
+        <x-popup close="closeModals">
+            <form wire:submit='addCategory' class="space-y-6">
+                <div class="flex flex-row justify-between items-center">
+                    <flux:heading size="xl">
+                        Create Custom Category
+                    </flux:heading>
 
+                    <flux:button wire:click='closeModals'>
+                        X
+                    </flux:button>
+                </div>
+
+                {{-- Goal Contents --}}
+                <div class="space-y-6">
+
+                    {{-- Name --}}
+                    <div>
+                        <flux:text class="mb-2">Name</flux:text>
+                        <flux:input
+                            placeholder="Goal Name"
+                            wire:model='name'
+                            required
+                            type="text"
+                        />
+                        <div>
+                            @error('name')
+                                <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- Target Amount --}}
+                    <div>
+                        <flux:text class="mb-2">Target Amount</flux:text>
+                        <flux:input
+                            placeholder="₱ 500.00"
+                            wire:model='taget_amount'
+                            required
+                            type="number"
+                        />
+                        <div>
+                            @error('name')
+                                <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- Icon --}}
+                    <div>
+                        <flux:text class="mb-2">Choose an Icon</flux:text>
+
+                        <div class="max-h-50 overflow-y-auto rounded-lg border p-2">
+                            <div class="grid grid-cols-6  gap-2">
+                                @foreach ($icons as $item )
+                                    <button
+                                        type="button"
+                                        wire:click="toggleIcon('{{ $item }}')"
+                                        class="flex aspect-square items-center justify-center rounded-lg border transition-all duration-300 {{ $icon ===  $item
+                                            ? 'border-blue-500 bg-blue-100 text-blue-600 shadow-sm'
+                                            : 'border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 scale-105'  }}"
+                                    >
+                                            <x-dynamic-component :component="'lucide-'.$item"
+                                                class="size-4"
+                                            />
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                        @error('icon')
+                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Color --}}
+                    <div>
+                        <flux:text class="mb-2">Choose a Color</flux:text>
+
+                        <div class="max-h-50 overflow-y-auto rounded-lg border p-2">
+                            <div class="grid grid-cols-6 lg:grid-cols-8 gap-2">
+                                @foreach ($colors as $item )
+                                    <button
+                                        type="button"
+                                        wire:click="toggleColor('{{ $item }}')"
+                                        class="size-8 rounded-full border-2 transition-all duration-300
+                                                {{ $color === $item ? 'ring-2 ring-offset-2 ring-zinc-400 scale-110' : 'hover:scale-105'}}"
+                                    >
+                                        <div
+                                            class="size-full rounded-full
+                                                {{ match($item) {
+                                                    'red' => 'bg-red-600',
+                                                    'orange' => 'bg-orange-600',
+                                                    'amber' => 'bg-amber-600',
+                                                    'yellow' => 'bg-yellow-600',
+                                                    'lime' => 'bg-lime-600',
+                                                    'green' => 'bg-green-600',
+                                                    'emerald' => 'bg-emerald-600',
+                                                    'teal' => 'bg-teal-600',
+                                                    'cyan' => 'bg-cyan-600',
+                                                    'sky' => 'bg-sky-600',
+                                                    'blue' => 'bg-blue-600',
+                                                    'indigo' => 'bg-indigo-600',
+                                                    'violet' => 'bg-violet-600',
+                                                    'purple' => 'bg-purple-600',
+                                                    'pink' => 'bg-pink-600',
+                                                    'zinc' => 'bg-zinc-600',
+                                                } }}"
+                                        >
+                                        </div>
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                        @error('color')
+                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex justify-end gap-2">
+                        <flux:button
+                            wire:click='closeModals'
+                        >
+                            Cancel
+                        </flux:button>
+
+                        <flux:button
+                            type="submit"
+                            icon="plus-circle"
+                        >
+                            Create Category
+                        </flux:button>
+                    </div>
+
+                </div>
+            </form>
         </x-popup>
     @endif
 </div>

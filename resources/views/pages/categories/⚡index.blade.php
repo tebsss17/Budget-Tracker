@@ -64,6 +64,7 @@ new class extends Component
         'violet',
         'purple',
         'pink',
+        'zinc'
     ];
 
 
@@ -471,7 +472,7 @@ new class extends Component
                                                     'violet' => 'bg-violet-600',
                                                     'purple' => 'bg-purple-600',
                                                     'pink' => 'bg-pink-600',
-                                                    default => 'bg-zinc-600',
+                                                    'zinc' => 'bg-zinc-600',
                                                 } }}"
                                         >
                                         </div>

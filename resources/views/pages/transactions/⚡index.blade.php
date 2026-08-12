@@ -275,7 +275,7 @@ new class extends Component
 
                 <div class="space-y-6">
                     <div>
-                        <flux:text class="mb-2">Type of Trancsaction</flux:text>
+                        <flux:text class="mb-2">Type of Transaction</flux:text>
                         <flux:select wire:model='type' placeholder="Select type of transaction..." required>
                             <flux:select.option>Income</flux:select.option>
                             <flux:select.option>Expense</flux:select.option>
