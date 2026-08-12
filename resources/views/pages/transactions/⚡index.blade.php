@@ -43,7 +43,7 @@ new class extends Component
             })
             ->orderBy('transaction_date', 'desc')
             ->orderBy('created_at', 'desc')
-            ->paginate(1);
+            ->paginate(10);
     }
 
     public function categories()
