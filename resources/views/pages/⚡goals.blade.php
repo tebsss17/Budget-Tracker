@@ -22,38 +22,33 @@ new class extends Component
     public $fliterStatus = '';
     public $filterYear = '';
 
-    public $icons = [
-        'smartphone',
-        'laptop',
-        'house',
-        'plane',
-        'car',
-        'motorbike',
-        'camera',
-        'heart-pulse',
-        'gem',
-        'gift',
-        'briefcase-business',
-        'target',
-    ];
+        public $icons = [
+            'smartphone',
+            'laptop',
+            'house',
+            'plane',
+            'car',
+            'motorbike',
+            'camera',
+            'heart-pulse',
+            'gem',
+            'gift',
+            'briefcase-business',
+            'target',
+        ];
 
     public $colors = [
         'red',
         'orange',
         'amber',
         'yellow',
-        'lime',
-        'green',
         'emerald',
         'teal',
         'cyan',
         'sky',
         'blue',
-        'indigo',
-        'violet',
         'purple',
         'pink',
-        'zinc'
     ];
 
 
@@ -147,6 +142,20 @@ new class extends Component
 
 
     // CRUD FUNCTIONS
+    public function setGoal()
+    {
+
+    }
+
+    public function editGoal()
+    {
+
+    }
+
+    public function deleteGoal()
+    {
+
+    }
 
     public function toggleIcon($icon)
     {
@@ -218,7 +227,7 @@ new class extends Component
             <form wire:submit='addCategory' class="space-y-6">
                 <div class="flex flex-row justify-between items-center">
                     <flux:heading size="xl">
-                        Create Custom Category
+                        Set Goal
                     </flux:heading>
 
                     <flux:button wire:click='closeModals'>
@@ -249,13 +258,29 @@ new class extends Component
                     <div>
                         <flux:text class="mb-2">Target Amount</flux:text>
                         <flux:input
-                            placeholder="₱ 500.00"
+                            placeholder="₱500.00"
                             wire:model='taget_amount'
                             required
                             type="number"
                         />
                         <div>
-                            @error('name')
+                            @error('target_amount')
+                                <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- Target Date --}}
+                    <div>
+                        <flux:text class="mb-2">Target Date</flux:text>
+                        <flux:input
+
+                            wire:model='target_date'
+                            required
+                            type="month"
+                        />
+                        <div>
+                            @error('target_amount')
                                 <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                             @enderror
                         </div>
@@ -307,18 +332,13 @@ new class extends Component
                                                     'orange' => 'bg-orange-600',
                                                     'amber' => 'bg-amber-600',
                                                     'yellow' => 'bg-yellow-600',
-                                                    'lime' => 'bg-lime-600',
-                                                    'green' => 'bg-green-600',
                                                     'emerald' => 'bg-emerald-600',
                                                     'teal' => 'bg-teal-600',
                                                     'cyan' => 'bg-cyan-600',
                                                     'sky' => 'bg-sky-600',
                                                     'blue' => 'bg-blue-600',
-                                                    'indigo' => 'bg-indigo-600',
-                                                    'violet' => 'bg-violet-600',
                                                     'purple' => 'bg-purple-600',
                                                     'pink' => 'bg-pink-600',
-                                                    'zinc' => 'bg-zinc-600',
                                                 } }}"
                                         >
                                         </div>
@@ -342,10 +362,200 @@ new class extends Component
                             type="submit"
                             icon="plus-circle"
                         >
-                            Create Category
+                            Set Goal
                         </flux:button>
                     </div>
 
+                </div>
+            </form>
+        </x-popup>
+    @endif
+
+    {{-- Edit Modal --}}
+    @if ($showEditModal === true)
+        <x-popup close="closeModals">
+            <form wire:submit='editCategory' class="space-y-6">
+                <div class="flex flex-row justify-between items-center">
+                    <flux:heading size="xl">
+                        Edit Goal {{ $selectedGoal->name ?: 'Test' }}
+                    </flux:heading>
+
+                    <flux:button wire:click='closeModals'>
+                        X
+                    </flux:button>
+                </div>
+
+                {{-- Goal Contents --}}
+                <div class="space-y-6">
+
+                    {{-- Name --}}
+                    <div>
+                        <flux:text class="mb-2">Name</flux:text>
+                        <flux:input
+                            placeholder="Goal Name"
+                            wire:model='name'
+                            required
+                            type="text"
+                        />
+                        <div>
+                            @error('name')
+                                <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- Target Amount --}}
+                    <div>
+                        <flux:text class="mb-2">Target Amount</flux:text>
+                        <flux:input
+                            placeholder="₱500.00"
+                            wire:model='taget_amount'
+                            required
+                            type="number"
+                        />
+                        <div>
+                            @error('target_amount')
+                                <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- Target Date --}}
+                    <div>
+                        <flux:text class="mb-2">Target Date</flux:text>
+                        <flux:input
+
+                            wire:model='target_date'
+                            required
+                            type="month"
+                        />
+                        <div>
+                            @error('target_amount')
+                                <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- Icon --}}
+                    <div>
+                        <flux:text class="mb-2">Choose an Icon</flux:text>
+
+                        <div class="max-h-50 overflow-y-auto rounded-lg border p-2">
+                            <div class="grid grid-cols-6  gap-2">
+                                @foreach ($icons as $item )
+                                    <button
+                                        type="button"
+                                        wire:click="toggleIcon('{{ $item }}')"
+                                        class="flex aspect-square items-center justify-center rounded-lg border transition-all duration-300 {{ $icon ===  $item
+                                            ? 'border-blue-500 bg-blue-100 text-blue-600 shadow-sm'
+                                            : 'border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 scale-105'  }}"
+                                    >
+                                            <x-dynamic-component :component="'lucide-'.$item"
+                                                class="size-4"
+                                            />
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                        @error('icon')
+                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Color --}}
+                    <div>
+                        <flux:text class="mb-2">Choose a Color</flux:text>
+
+                        <div class="max-h-50 overflow-y-auto rounded-lg border p-2">
+                            <div class="grid grid-cols-6 lg:grid-cols-8 gap-2">
+                                @foreach ($colors as $item )
+                                    <button
+                                        type="button"
+                                        wire:click="toggleColor('{{ $item }}')"
+                                        class="size-8 rounded-full border-2 transition-all duration-300
+                                                {{ $color === $item ? 'ring-2 ring-offset-2 ring-zinc-400 scale-110' : 'hover:scale-105'}}"
+                                    >
+                                        <div
+                                            class="size-full rounded-full
+                                                {{ match($item) {
+                                                    'red' => 'bg-red-600',
+                                                    'orange' => 'bg-orange-600',
+                                                    'amber' => 'bg-amber-600',
+                                                    'yellow' => 'bg-yellow-600',
+                                                    'emerald' => 'bg-emerald-600',
+                                                    'teal' => 'bg-teal-600',
+                                                    'cyan' => 'bg-cyan-600',
+                                                    'sky' => 'bg-sky-600',
+                                                    'blue' => 'bg-blue-600',
+                                                    'purple' => 'bg-purple-600',
+                                                    'pink' => 'bg-pink-600',
+                                                } }}"
+                                        >
+                                        </div>
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                        @error('color')
+                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex justify-end gap-2">
+                        <flux:button
+                            wire:click='closeModals'
+                        >
+                            Cancel
+                        </flux:button>
+
+                        <flux:button
+                            type="submit"
+                            icon="plus-circle"
+                        >
+                            Save Changes
+                        </flux:button>
+                    </div>
+
+                </div>
+            </form>
+        </x-popup>
+    @endif
+
+    {{-- Delete Modal --}}
+    @if ($showDeleteModal == true)
+        <x-popup close="closeModals">
+            <form wire:submit='deleteGoal' class="space-y-6">
+                <div class="flex flex-row justify-between items-center">
+                    <flux:heading size="xl">
+                        Delete {{ $selectedGoal->name }} goal
+                    </flux:heading>
+
+                    <flux:button wire:click='closeModals'>
+                        X
+                    </flux:button>
+                </div>
+
+                <div>
+                    <flux:text>
+                        Are you sure you want to delete this goal?
+                    </flux:text>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="flex justify-end gap-2">
+                        <flux:button
+                            wire:click='closeModals'
+                        >
+                            Cancel
+                        </flux:button>
+
+                        <flux:button
+                            type="submit"
+                            wire:loading.attr='disabled'
+                        >
+                            Delete Goal
+                        </flux:button>
+                    </div>
                 </div>
             </form>
         </x-popup>
