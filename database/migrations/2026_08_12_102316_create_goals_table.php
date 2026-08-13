@@ -17,11 +17,9 @@ return new class extends Migration
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->decimal('target_amount', 12, 2);
-            $table->decimal('current_amount', 12, 2)->default(0);
             $table->date('target_date')->nullable();
-            $table->string('description')->nullable();
             $table->string('icon');
-            $table->string('color');
+            $table->string('color')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

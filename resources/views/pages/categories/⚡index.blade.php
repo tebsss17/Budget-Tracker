@@ -98,7 +98,7 @@ new class extends Component
 
 
 
-    // HELPERS FUCNTIONS
+    // HELPER FUCNTIONS
     public function toggleIcon($icon)
     {
         $this->icon = $this->icon === $icon ? '' : $icon;
