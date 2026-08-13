@@ -1,6 +1,7 @@
 <?php
 
 use Livewire\Component;
+use Flux\Flux;
 
 new class extends Component
 {
@@ -142,14 +143,48 @@ new class extends Component
 
 
     // CRUD FUNCTIONS
-    public function setGoal()
+    protected function rules()
+    {
+        return [
+            'name' => 'required|string|min:5',
+            'target_amount' => 'required|number|min:500',
+            'target_date' => 'required|date',
+            'icon' => 'required',
+            'color' => 'required',
+        ];
+    }
+
+    protected function messages()
     {
 
     }
 
+    public function setGoal()
+    {
+        $validated = $this->validate();
+
+        $validated['name'] = strtolower(trim($validated['name']));
+        $validated['is_active'] = true;
+
+        Auth::user()->goal()->create($validated);
+
+        Flux::toast(variant: 'sucess', text: 'Goal Created Successfully!');
+
+        $this->closeModals();
+    }
+
     public function editGoal()
     {
+        $validated = $this->validate();
 
+        $validated['name'] = strtolower(trim($validated['name']));
+        $validated['is_active'] = true;
+
+        Auth::user()->goal()->update($validated);
+
+        Flux::toast(variant: 'sucess', text: 'Goal Updated Successfully!');
+
+        $this->closeModals();
     }
 
     public function deleteGoal()

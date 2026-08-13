@@ -12,7 +12,7 @@ new class extends Component
 
     public function mount()
     {
-        if(Auth::user()->starting_balance === null){
+        if(!Auth::user()->account()->exists()){
             $this->step = 1;
         }else{
             $this->step = 0;

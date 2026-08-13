@@ -4,12 +4,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified',])->group(function (){
     Route::livewire('/dashboard', 'pages::dashboard')->name('dashboard');
+});
+
+Route::middleware([ 'has-account'])->group(function () {
+    Route::livewire('/accounts', 'pages::accounts.index')->name('accounts');
 
     Route::livewire('/transactions', 'pages::transactions.index')->name('transactions');
-
-    Route::livewire('/accounts', 'pages::accounts.index')->name('accounts');
 
     Route::livewire('/categories', 'pages::categories.index')->name('categories');
 
